@@ -58,6 +58,70 @@ bool Window::initOpenGL() {
 	return true;
 }
 
+void Window::setWindowPosCallback(GLFWwindowposfun callback) {
+	glfwSetWindowPosCallback(window, callback);
+}
+
+void Window::setWindowSizeCallback(GLFWwindowsizefun callback) {
+	glfwSetWindowSizeCallback(window, callback);
+}
+
+void Window::setWindowCloseCallback(GLFWwindowclosefun callback) {
+	glfwSetWindowCloseCallback(window, callback);
+}
+
+void Window::setWindowRefreshCallback(GLFWwindowrefreshfun callback) {
+	glfwSetWindowRefreshCallback(window, callback);
+}
+
+void Window::setWindowFocusCallback(GLFWwindowfocusfun callback) {
+	glfwSetWindowFocusCallback(window, callback);
+}
+
+void Window::setWindowIconifyCallback(GLFWwindowiconifyfun callback) {
+	glfwSetWindowIconifyCallback(window, callback);
+}
+
+void Window::setWindowMaximizeCallback(GLFWwindowmaximizefun callback) {
+	glfwSetWindowMaximizeCallback(window, callback);
+}
+
+void Window::setFramebufferSizeCallback(GLFWframebuffersizefun callback) {
+	glfwSetFramebufferSizeCallback(window, callback);
+}
+
+void Window::setWindowContentScaleCallback(GLFWwindowcontentscalefun callback) {
+	glfwSetWindowContentScaleCallback(window, callback);
+}
+
+void Window::setKeyCallback(GLFWkeyfun callback) {
+	glfwSetKeyCallback(window, callback);
+}
+
+void Window::setCharCallback(GLFWcharfun callback) {
+	glfwSetCharCallback(window, callback);
+}
+
+void Window::setCursorPosCallback(GLFWcursorposfun callback) {
+	glfwSetCursorPosCallback(window, callback);
+}
+
+void Window::setCursorEnterCallback(GLFWcursorenterfun callback) {
+	glfwSetCursorEnterCallback(window, callback);
+}
+
+void Window::setMouseButtonCallback(GLFWmousebuttonfun callback) {
+	glfwSetMouseButtonCallback(window, callback);
+}
+
+void Window::setScrollCallback(GLFWscrollfun callback) {
+	glfwSetScrollCallback(window, callback);
+}
+
+void Window::setDropCallback(GLFWdropfun callback) {
+	glfwSetDropCallback(window, callback);
+}
+
 void Window::loop() {
 	while (!glfwWindowShouldClose(window))
 	{

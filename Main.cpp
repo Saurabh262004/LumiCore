@@ -4,8 +4,31 @@
 
 #include "Window/Window.hpp"
 
-int main()
-{
+void resize(GLFWwindow* window, int width, int height) {
+	std::cout << width << " " << height << '\n';
+}
+
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
+}
+
+void mouseMotionCallback(GLFWwindow* window, double x, double y) {
+	std::cout << x << ", " << y << '\n';
+}
+
+void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods) {
+	if (action == GLFW_PRESS)  {
+		if (button == GLFW_MOUSE_BUTTON_LEFT) {
+			std::cout << "left\n";
+		} else if (button == GLFW_MOUSE_BUTTON_RIGHT) {
+			std::cout << "right\n";
+		}
+	}
+}
+
+int main() {
 	if (!glfwInit())
 	{
 		std::cerr << "Failed to initialize GLFW\n";
@@ -13,5 +36,11 @@ int main()
 	}
 
 	Window window(800, 600);
+
+	window.setFramebufferSizeCallback(resize);
+	window.setKeyCallback(keyCallback);
+	window.setCursorPosCallback(mouseMotionCallback);
+	window.setMouseButtonCallback(mouseButtonCallback);
+
 	window.loop();
 }
