@@ -1,12 +1,13 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-#include "../external/glad/glad.h"
+#include "../../external/glad/glad.h"
 #include <GLFW/glfw3.h>
 
 class Window {
 public:
 	Window(int width, int height, bool fullscreen = false);
+	~Window();
 
 	int width;
 	int height;
@@ -37,11 +38,11 @@ public:
 	void setDropCallback(GLFWdropfun callback);                             // Files dropped onto window
 
 	void loop();
-	void clean();
 
 private:
 	GLFWwindow *window;
 	bool initOpenGL();
+	void checkError(const char* where);
 };
 
 #endif
