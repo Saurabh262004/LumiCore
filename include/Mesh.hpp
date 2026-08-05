@@ -2,18 +2,17 @@
 #define MESH_HPP
 
 #include <Vertex.hpp>
-#include <vector>
 
 class Mesh {
 public:
 	Mesh(const Vertex *verts, std::size_t count);
 	~Mesh();
-	void use();
+	void draw();
 
 private:
-    std::vector<Vertex> vertices;
-	GLuint VAO;
-	GLuint VBO;
+	GLuint VAO{};
+	GLuint VBO{};
+	std::size_t vertexCount{};
 };
 
 #endif
