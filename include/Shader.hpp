@@ -14,7 +14,7 @@ public:
 	void use() const;
 
 private:
-	GLuint program;
+	GLuint program{};
 };
 
 #endif

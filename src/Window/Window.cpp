@@ -2,14 +2,17 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <vector>
+#include <random>
 
 #include <Util.hpp>
+#include <Vec3.h>
 #include <Vertex.hpp>
 #include <Mesh.hpp>
 #include <Shader.hpp>
 #include <Window.hpp>
 
-Window::Window(int width, int height, bool fullscreen) {
+Window::Window(int width, int height, bool fullscreen) : width{width}, height{height}, fullscreen{fullscreen} {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -63,7 +66,7 @@ bool Window::initOpenGL(int width, int height) {
 	glEnable(GL_CULL_FACE);
 	//glFrontFace(GL_CW);
 
-	glfwSwapInterval(0);
+	glfwSwapInterval(1);
 
 	glViewport(0, 0, width, height);
 
@@ -79,18 +82,33 @@ void Window::checkError(const char* where) {
 
 void Window::loop() {
 	Vertex square[] = {
-		{{-0.25f,  0.25f, 0.0f}},
-		{{-0.25f, -0.25f, 0.0f}},
-		{{ 0.25f,  0.25f, 0.0f}},
+		{{-0.0050f,  0.0050f, 0.0f}},
+		{{-0.0050f, -0.0050f, 0.0f}},
+		{{ 0.0050f,  0.0050f, 0.0f}},
 
-		{{ 0.25f,  0.25f, 0.0f}},
-		{{-0.25f, -0.25f, 0.0f}},
-		{{ 0.25f, -0.25f, 0.0f}}
+		//{{ 0.025f,  0.025f, 0.0f}},
+		//{{-0.025f, -0.025f, 0.0f}},
+		//{{ 0.025f, -0.025f, 0.0f}}
 	};
+
+	int detail = 5000;
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<int> distrib(1, detail);
+
+	std::vector<Vec3> offsets;
+	
+	for (int i = 0; i < 100; ++i) {
+		float random_num1 = ((float)distrib(gen) / (detail / 2)) - 1;
+		float random_num2 = ((float)distrib(gen) / (detail / 2)) - 1;
+		offsets.push_back({random_num1, random_num2, 0.0f});
+	}
 
 	Mesh mesh(square, std::size(square));
 
-	Shader shader("shaders/triangle.vert", "shaders/triangle.frag");
+	mesh.setInstanceOffsets(offsets.data(), offsets.size());
+
+	Shader shader("shaders/shader.vert", "shaders/shader.frag");
 
 	// Render Loop
 
@@ -114,13 +132,15 @@ void Window::loop() {
 
 		shader.use();
 
-		mesh.draw();
+		//mesh.draw();
 
-		//GLenum err = glGetError();
+		mesh.drawInstanced(offsets.size());
 
-		//if (err != GL_NO_ERROR) {
-		//	std::cout << "OpenGL Error: " << err << '\n';
-		//}
+		GLenum err = glGetError();
+
+		if (err != GL_NO_ERROR) {
+			std::cout << "OpenGL Error: " << err << '\n';
+		}
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();

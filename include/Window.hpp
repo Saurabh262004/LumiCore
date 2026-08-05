@@ -6,12 +6,12 @@
 
 class Window {
 public:
-	Window(int width, int height, bool fullscreen = false);
+	Window(int width = 854, int height = 480, bool fullscreen = false);
 	~Window();
 
-	int width;
-	int height;
-	bool fullscreen;
+	int width{};
+	int height{};
+	bool fullscreen{};
 
 	GLFWwindow *getWindow();
 
