@@ -113,8 +113,6 @@ void Window::loop() {
 		Mat4 scaled = Mat4::scale(Vec3{scaleXs[i], scaleYs[i], 0.01f});
 
 		Mat4 model = translated * rotated * scaled;
-		//Mat4 model = scaled;
-		//Mat4 model = Mat4::identity();
 
 		Vec3 color =  { reds[i], greens[i], blues[i] };
 
