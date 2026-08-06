@@ -1,5 +1,4 @@
-#ifndef VEC2_HPP
-#define VEC2_HPP
+#pragma once
 
 #include <cmath>
 
@@ -95,5 +94,3 @@ struct Vec2 {
 		return std::sqrt(x*x + y*y);
 	}
 };
-
-#endif

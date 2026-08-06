@@ -6,9 +6,9 @@
 #include <random>
 
 #include <Util.hpp>
-#include <Vec3.h>
-#include <Vertex.hpp>
-#include <Mesh.hpp>
+#include <Geometry/Vec3.hpp>
+#include <Geometry/InstanceData.hpp>
+#include <Geometry/Mesh.hpp>
 #include <Shader.hpp>
 #include <Window.hpp>
 
@@ -81,32 +81,47 @@ void Window::checkError(const char* where) {
 }
 
 void Window::loop() {
-	Vertex square[] = {
-		{{-0.0050f,  0.0050f, 0.0f}},
-		{{-0.0050f, -0.0050f, 0.0f}},
-		{{ 0.0050f,  0.0050f, 0.0f}},
+	Vec3 square[] = {
+		{-1.0f,  1.0f, 0.0f},
+		{-1.0f, -1.0f, 0.0f},
+		{ 1.0f,  1.0f, 0.0f},
 
-		//{{ 0.025f,  0.025f, 0.0f}},
-		//{{-0.025f, -0.025f, 0.0f}},
-		//{{ 0.025f, -0.025f, 0.0f}}
+		{ 1.0f,  1.0f, 0.0f},
+		{-1.0f, -1.0f, 0.0f},
+		{ 1.0f, -1.0f, 0.0f}
 	};
-
-	int detail = 5000;
-	std::random_device rd;
-	std::mt19937 gen(rd());
-	std::uniform_int_distribution<int> distrib(1, detail);
-
-	std::vector<Vec3> offsets;
-	
-	for (int i = 0; i < 100; ++i) {
-		float random_num1 = ((float)distrib(gen) / (detail / 2)) - 1;
-		float random_num2 = ((float)distrib(gen) / (detail / 2)) - 1;
-		offsets.push_back({random_num1, random_num2, 0.0f});
-	}
 
 	Mesh mesh(square, std::size(square));
 
-	mesh.setInstanceOffsets(offsets.data(), offsets.size());
+	std::size_t count = 100;
+
+	std::vector<InstanceData> instances;
+	instances.reserve(count);
+
+	std::vector<float> xs       = Util::randFV(-1.0f, 1.0f, count);
+	std::vector<float> ys       = Util::randFV(-1.0f, 1.0f, count);
+	std::vector<float> rots     = Util::randFV(0.0f, 6.2831853f, count);
+	std::vector<float> reds     = Util::randFV(0.0f, 1.0f, count);
+	std::vector<float> greens   = Util::randFV(0.0f, 1.0f, count);
+	std::vector<float> blues    = Util::randFV(0.0f, 1.0f, count);
+	std::vector<float> scaleXs  = Util::randFV(0.001f, 0.025f, count);
+	std::vector<float> scaleYs  = Util::randFV(0.001f, 0.025f, count);
+
+	for (std::size_t i = 0; i < count; ++i) {
+		Mat4 translated = Mat4::translate(Vec3{xs[i], ys[i], 0.0f});
+		Mat4 rotated = Mat4::rotateZ(rots[i]);
+		Mat4 scaled = Mat4::scale(Vec3{scaleXs[i], scaleYs[i], 0.01f});
+
+		Mat4 model = translated * rotated * scaled;
+		//Mat4 model = scaled;
+		//Mat4 model = Mat4::identity();
+
+		Vec3 color =  { reds[i], greens[i], blues[i] };
+
+		instances.push_back(InstanceData{ model, color });
+	}
+
+	mesh.setInstanceData(instances.data(), instances.size());
 
 	Shader shader("shaders/shader.vert", "shaders/shader.frag");
 
@@ -117,7 +132,7 @@ void Window::loop() {
 	double lastTime = glfwGetTime();
 
 	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.15f, 0.2f, 0.3f, 1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		frames++;
@@ -132,9 +147,7 @@ void Window::loop() {
 
 		shader.use();
 
-		//mesh.draw();
-
-		mesh.drawInstanced(offsets.size());
+		mesh.draw(instances.size());
 
 		GLenum err = glGetError();
 

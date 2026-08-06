@@ -1,5 +1,4 @@
-#ifndef VEC3_HPP
-#define VEC3_HPP
+#pragma once
 
 #include <cmath>
 
@@ -108,5 +107,3 @@ struct Vec3 {
 		return std::sqrt(x*x + y*y + z*z);
 	}
 };
-
-#endif

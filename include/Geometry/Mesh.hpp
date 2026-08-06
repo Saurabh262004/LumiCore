@@ -1,15 +1,14 @@
-#ifndef MESH_HPP
-#define MESH_HPP
+#pragma once
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <Vec3.h>
-#include <Vertex.hpp>
+#include <Geometry/Vec3.hpp>
+#include <Geometry/InstanceData.hpp>
 
 class Mesh {
 public:
-	Mesh(const Vertex *verts, std::size_t count);
+	Mesh(const Vec3 *verts, std::size_t count);
 	~Mesh();
 
 	Mesh(const Mesh&) = delete;
@@ -18,9 +17,8 @@ public:
 	Mesh(Mesh&& other) noexcept;
 	Mesh& operator=(Mesh&& other) noexcept;
 
-	void setInstanceOffsets(const Vec3 *offsets, std::size_t count);
-	void draw() const;
-	void drawInstanced(std::size_t instanceCount) const;
+	void setInstanceData(const InstanceData* data, std::size_t count);
+	void draw(std::size_t instanceCount) const;
 
 private:
 	GLuint VAO{0};
@@ -28,5 +26,3 @@ private:
 	GLuint instanceVBO{0};
 	std::size_t vertexCount{0};
 };
-
-#endif
