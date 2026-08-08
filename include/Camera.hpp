@@ -7,6 +7,11 @@ class Camera {
 private:
 	Vec3 position;
 	float pitch{0.0f}, yaw{0.0f}, roll{0.0f};
+	float fov = 45.0f * (M_PI / 180.0f);
+	float nearPlane = 0.1f;
+	float farPlane = 100.0f;
+	float viewportWidth = 800.0f;
+    float viewportHeight = 600.0f;
 
 public:
 	void setPosition(Vec3 newPosition) {
@@ -45,5 +50,14 @@ public:
 		Mat4 rotation = Mat4::rotateZ(-roll) * Mat4::rotateY(-yaw) * Mat4::rotateX(-pitch);
 		Mat4 translation  = Mat4::translate(-position);
 		return rotation * translation;
+	}
+
+	Mat4 getProjection() const {
+		float aspect = viewportWidth / viewportHeight;
+		return Mat4::perspective(fov, aspect, nearPlane, farPlane);
+	}
+
+	Mat4 getViewProjection() const {
+		return this->getProjection() * this->getView();
 	}
 };

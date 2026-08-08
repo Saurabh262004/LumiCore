@@ -81,17 +81,28 @@ void Window::checkError(const char* where) {
 }
 
 void Window::loop() {
-	Vec3 square[] = {
-		{-0.5f,  0.5f, 0.0f},
-		{-0.5f, -0.5f, 0.0f},
-		{ 0.5f,  0.5f, 0.0f},
-
-		{ 0.5f,  0.5f, 0.0f},
-		{-0.5f, -0.5f, 0.0f},
-		{ 0.5f, -0.5f, 0.0f}
+	Vec3 cube[] = {
+		// Front face
+		{-0.5f, -0.5f,  0.5f}, { 0.5f, -0.5f,  0.5f}, { 0.5f,  0.5f,  0.5f},
+		{ 0.5f,  0.5f,  0.5f}, {-0.5f,  0.5f,  0.5f}, {-0.5f, -0.5f,  0.5f},
+		// Back face
+		{-0.5f, -0.5f, -0.5f}, {-0.5f,  0.5f, -0.5f}, { 0.5f,  0.5f, -0.5f},
+		{ 0.5f,  0.5f, -0.5f}, { 0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f},
+		// Left face
+		{-0.5f,  0.5f,  0.5f}, {-0.5f,  0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f},
+		{-0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f,  0.5f}, {-0.5f,  0.5f,  0.5f},
+		// Right face
+		{ 0.5f,  0.5f,  0.5f}, { 0.5f, -0.5f, -0.5f}, { 0.5f,  0.5f, -0.5f},
+		{ 0.5f, -0.5f, -0.5f}, { 0.5f,  0.5f,  0.5f}, { 0.5f, -0.5f,  0.5f},
+		// Top face
+		{-0.5f,  0.5f, -0.5f}, {-0.5f,  0.5f,  0.5f}, { 0.5f,  0.5f,  0.5f},
+		{ 0.5f,  0.5f,  0.5f}, { 0.5f,  0.5f, -0.5f}, {-0.5f,  0.5f, -0.5f},
+		// Bottom face
+		{-0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f,  0.5f},
+		{ 0.5f, -0.5f,  0.5f}, {-0.5f, -0.5f,  0.5f}, {-0.5f, -0.5f, -0.5f},
 	};
 
-	Mesh mesh(square, std::size(square));
+	Mesh mesh(cube, std::size(cube));
 
 	std::size_t count = 1;
 
@@ -100,19 +111,25 @@ void Window::loop() {
 
 	//std::vector<float> xs       = Util::randFV(-1.0f, 1.0f, count);
 	//std::vector<float> ys       = Util::randFV(-1.0f, 1.0f, count);
-	//std::vector<float> rots     = Util::randFV(0.0f, 6.2831853f, count);
+	//std::vector<float> zs       = Util::randFV(-1.0f, 1.0f, count);
+	std::vector<float> rotXs     = Util::randFV(0.0f, 6.2831853f, count);
+	std::vector<float> rotYs     = Util::randFV(0.0f, 6.2831853f, count);
+	std::vector<float> rotZs     = Util::randFV(0.0f, 6.2831853f, count);
 	std::vector<float> reds     = Util::randFV(0.0f, 1.0f, count);
 	std::vector<float> greens   = Util::randFV(0.0f, 1.0f, count);
 	std::vector<float> blues    = Util::randFV(0.0f, 1.0f, count);
-	//std::vector<float> scaleXs  = Util::randFV(0.001f, 0.025f, count);
-	//std::vector<float> scaleYs  = Util::randFV(0.001f, 0.025f, count);
+	//std::vector<float> scaleXs  = Util::randFV(0.002f, 0.05f, count);
+	//std::vector<float> scaleYs  = Util::randFV(0.002f, 0.05f, count);
+	//std::vector<float> scaleZs  = Util::randFV(0.002f, 0.05f, count);
 
 	for (std::size_t i = 0; i < count; ++i) {
-		//Mat4 translated = Mat4::translate(Vec3{xs[i], ys[i], 0.0f});
-		//Mat4 rotated = Mat4::rotateZ(rots[i]);
-		//Mat4 scaled = Mat4::scale(Vec3{scaleXs[i], scaleYs[i], 0.01f});
+		//Mat4 translated = Mat4::translate(Vec3{xs[i], ys[i], zs[i]});
+		Mat4 translated = Mat4::identity();
+		Mat4 rotated = Mat4::rotateX(rotXs[i]) * Mat4::rotateY(rotYs[i]) * Mat4::rotateZ(rotZs[i]);
+		//Mat4 scaled = Mat4::scale(Vec3{scaleXs[i], scaleYs[i], scaleZs[i]});
+		Mat4 scaled = Mat4::identity();
 
-		Mat4 model = Mat4::identity();
+		Mat4 model = translated * rotated * scaled;
 
 		Vec3 color =  { reds[i], greens[i], blues[i] };
 
@@ -129,6 +146,11 @@ void Window::loop() {
 
 	double lastTime = glfwGetTime();
 
+	float stopPoint = M_PI * 2;
+	float step = 0.002;
+
+	camera.setPosition({0.0f, 0.0f, 3.0f});
+
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -144,17 +166,21 @@ void Window::loop() {
 		}
 
 		shader.use();
-		shader.setMat4("viewProjection", camera.getView());
+		shader.setMat4("viewProjection", camera.getViewProjection());
 		mesh.draw(instances.size());
 
 		float roll = camera.getRoll();
 
-		if (roll < (3.1415 / 2)) {
-			roll += 0.005;
+		if (roll < stopPoint) {
+			roll += step;
 
 			camera.setRoll(roll);
+			//camera.setPitch(roll);
+			//camera.setYaw(roll);
 		} else {
-			camera.setRoll(3.1415 / 2);
+			camera.setRoll(stopPoint);
+			//camera.setPitch(stopPoint);
+			//camera.setYaw(stopPoint);
 		}
 
 		GLenum err = glGetError();

@@ -36,7 +36,7 @@ int main() {
 		return -1;
 	}
 
-	Window window(1280, 720);
+	Window window(800, 600);
 
 	window.setFramebufferSizeCallback(resize);
 	window.setKeyCallback(keyCallback);
