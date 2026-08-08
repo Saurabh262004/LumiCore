@@ -34,6 +34,10 @@ struct Vec2 {
 		return *this;
 	}
 
+	Vec2 operator-() const {
+		return {-x, -y};
+	}
+
 	Vec2 operator*(const Vec2& other) const {
 		return {
 			x * other.x,

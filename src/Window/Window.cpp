@@ -82,37 +82,37 @@ void Window::checkError(const char* where) {
 
 void Window::loop() {
 	Vec3 square[] = {
-		{-1.0f,  1.0f, 0.0f},
-		{-1.0f, -1.0f, 0.0f},
-		{ 1.0f,  1.0f, 0.0f},
+		{-0.5f,  0.5f, 0.0f},
+		{-0.5f, -0.5f, 0.0f},
+		{ 0.5f,  0.5f, 0.0f},
 
-		{ 1.0f,  1.0f, 0.0f},
-		{-1.0f, -1.0f, 0.0f},
-		{ 1.0f, -1.0f, 0.0f}
+		{ 0.5f,  0.5f, 0.0f},
+		{-0.5f, -0.5f, 0.0f},
+		{ 0.5f, -0.5f, 0.0f}
 	};
 
 	Mesh mesh(square, std::size(square));
 
-	std::size_t count = 100;
+	std::size_t count = 1;
 
 	std::vector<InstanceData> instances;
 	instances.reserve(count);
 
-	std::vector<float> xs       = Util::randFV(-1.0f, 1.0f, count);
-	std::vector<float> ys       = Util::randFV(-1.0f, 1.0f, count);
-	std::vector<float> rots     = Util::randFV(0.0f, 6.2831853f, count);
+	//std::vector<float> xs       = Util::randFV(-1.0f, 1.0f, count);
+	//std::vector<float> ys       = Util::randFV(-1.0f, 1.0f, count);
+	//std::vector<float> rots     = Util::randFV(0.0f, 6.2831853f, count);
 	std::vector<float> reds     = Util::randFV(0.0f, 1.0f, count);
 	std::vector<float> greens   = Util::randFV(0.0f, 1.0f, count);
 	std::vector<float> blues    = Util::randFV(0.0f, 1.0f, count);
-	std::vector<float> scaleXs  = Util::randFV(0.001f, 0.025f, count);
-	std::vector<float> scaleYs  = Util::randFV(0.001f, 0.025f, count);
+	//std::vector<float> scaleXs  = Util::randFV(0.001f, 0.025f, count);
+	//std::vector<float> scaleYs  = Util::randFV(0.001f, 0.025f, count);
 
 	for (std::size_t i = 0; i < count; ++i) {
-		Mat4 translated = Mat4::translate(Vec3{xs[i], ys[i], 0.0f});
-		Mat4 rotated = Mat4::rotateZ(rots[i]);
-		Mat4 scaled = Mat4::scale(Vec3{scaleXs[i], scaleYs[i], 0.01f});
+		//Mat4 translated = Mat4::translate(Vec3{xs[i], ys[i], 0.0f});
+		//Mat4 rotated = Mat4::rotateZ(rots[i]);
+		//Mat4 scaled = Mat4::scale(Vec3{scaleXs[i], scaleYs[i], 0.01f});
 
-		Mat4 model = translated * rotated * scaled;
+		Mat4 model = Mat4::identity();
 
 		Vec3 color =  { reds[i], greens[i], blues[i] };
 
@@ -144,8 +144,18 @@ void Window::loop() {
 		}
 
 		shader.use();
-
+		shader.setMat4("viewProjection", camera.getView());
 		mesh.draw(instances.size());
+
+		float roll = camera.getRoll();
+
+		if (roll < (3.1415 / 2)) {
+			roll += 0.005;
+
+			camera.setRoll(roll);
+		} else {
+			camera.setRoll(3.1415 / 2);
+		}
 
 		GLenum err = glGetError();
 

@@ -39,6 +39,10 @@ struct Vec3 {
 		return *this;
 	}
 
+	Vec3 operator-() const {
+		return {-x, -y, -z};
+	}
+
 	Vec3 operator*(const Vec3& other) const {
 		return {
 			x * other.x,

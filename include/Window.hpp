@@ -1,8 +1,8 @@
-#ifndef WINDOW_HPP
-#define WINDOW_HPP
+#pragma once
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <Camera.hpp>
 
 class Window {
 public:
@@ -12,6 +12,7 @@ public:
 	int width{};
 	int height{};
 	bool fullscreen{};
+	Camera camera;
 
 	GLFWwindow *getWindow();
 
@@ -105,5 +106,3 @@ private:
 	GLFWscrollfun customScrollCallback = nullptr;
 	GLFWdropfun customDropCallback = nullptr;
 };
-
-#endif

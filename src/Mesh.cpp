@@ -16,6 +16,7 @@ Mesh::Mesh(const Vec3* verts, std::size_t count) : vertexCount{count} {
 
 	// Bind VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+
 	glBufferData(GL_ARRAY_BUFFER, count * sizeof(Vec3), verts, GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3), (void*)0);
@@ -72,9 +73,10 @@ Mesh::~Mesh() {
 	glDeleteBuffers(1, &instanceVBO);
 }
 
-Mesh::Mesh(Mesh&& other) noexcept : VAO{other.VAO}, VBO{other.VBO}, vertexCount{other.vertexCount} {
+Mesh::Mesh(Mesh&& other) noexcept : VAO{other.VAO}, VBO{other.VBO}, instanceVBO{other.instanceVBO}, vertexCount{other.vertexCount} {
 	other.VAO = 0;
 	other.VBO = 0;
+	other.instanceVBO = 0;
 	other.vertexCount = 0;
 }
 
@@ -82,15 +84,17 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 	if (this != &other) {
 		glDeleteVertexArrays(1, &VAO);
 		glDeleteBuffers(1, &VBO);
+		glDeleteBuffers(1, &instanceVBO);
 
 		VAO = other.VAO;
 		VBO = other.VBO;
+		instanceVBO = other.instanceVBO;
 		vertexCount = other.vertexCount;
 
 		other.VAO = 0;
 		other.VBO = 0;
+		other.instanceVBO = 0;
 		other.vertexCount = 0;
 	}
-
 	return *this;
 }

@@ -5,18 +5,18 @@
 #include <cmath>
 
 struct Mat4 {
-	float m[16]{}; // zero-initialized, column-major: m[col*4 + row]
+	float m[16]{}; // zero-initialized, column-major: data[col*4 + row]
 
 	static Mat4 identity() {
-		Mat4 r;
+		Mat4 result;
 
-		r.m[0] = r.m[5] = r.m[10] = r.m[15] = 1.0f;
+		result.m[0] = result.m[5] = result.m[10] = result.m[15] = 1.0f;
 
-		return r;
+		return result;
 	}
 
 	Mat4 operator*(const Mat4& o) const {
-		Mat4 r;
+		Mat4 result;
 
 		for (int c = 0; c < 4; ++c) {
 			for (int row = 0; row < 4; ++row) {
@@ -26,11 +26,11 @@ struct Mat4 {
 					sum += m[k * 4 + row] * o.m[c * 4 + k];
 				}
 
-				r.m[c * 4 + row] = sum;
+				result.m[c * 4 + row] = sum;
 			}
 		}
 
-		return r;
+		return result;
 	}
 
 	Vec4 operator*(const Vec4& v) const {
@@ -43,30 +43,55 @@ struct Mat4 {
 	}
 
 	static Mat4 translate(const Vec3& t) {
-		Mat4 r = identity();
+		Mat4 result = identity();
 
-		r.m[12] = t.x; r.m[13] = t.y; r.m[14] = t.z;
+		result.m[12] = t.x; result.m[13] = t.y; result.m[14] = t.z;
 
-		return r;
+		return result;
 	}
 
 	static Mat4 scale(const Vec3& s) {
-		Mat4 r = identity();
+		Mat4 result = identity();
 
-		r.m[0] = s.x; r.m[5] = s.y; r.m[10] = s.z;
+		result.m[0] = s.x; result.m[5] = s.y; result.m[10] = s.z;
 
-		return r;
+		return result;
+	}
+
+	static Mat4 rotateX(float radians) {
+		Mat4 result = identity();
+
+		float cos = std::cos(radians);
+		float sin = std::sin(radians);
+
+		result.m[5] = cos; result.m[6] = sin;
+		result.m[9] = -sin; result.m[10] = cos;
+
+		return result;
+	}
+
+	static Mat4 rotateY(float radians) {
+		Mat4 result = identity();
+
+		float cos = std::cos(radians);
+		float sin = std::sin(radians);
+
+		result.m[0] = cos; result.m[2] = -sin;
+		result.m[8] = sin; result.m[10] = cos;
+
+		return result;
 	}
 
 	static Mat4 rotateZ(float radians) {
-		Mat4 r = identity();
+		Mat4 result = identity();
 
-		float c = std::cos(radians), s = std::sin(radians);
+		float cos = std::cos(radians);
+		float sin = std::sin(radians);
 
-		r.m[0] = c; r.m[1] = s;
-		r.m[4] = -s; r.m[5] = c;
+		result.m[0] = cos; result.m[1] = sin;
+		result.m[4] = -sin; result.m[5] = cos;
 
-		return r;
+		return result;
 	}
 
 	// (Rodrigues' rotation formula)
@@ -77,20 +102,24 @@ struct Mat4 {
 
 		float c = std::cos(radians), s = std::sin(radians), omc = 1.0f - c;
 
-		Mat4 r = identity();
+		Mat4 result = identity();
 
-		r.m[0] = c + axis.x*axis.x*omc;
-		r.m[1] = axis.y*axis.x*omc + axis.z*s;
-		r.m[2] = axis.z*axis.x*omc - axis.y*s;
+		result.m[0] = c + axis.x*axis.x*omc;
+		result.m[1] = axis.y*axis.x*omc + axis.z*s;
+		result.m[2] = axis.z*axis.x*omc - axis.y*s;
 
-		r.m[4] = axis.x*axis.y*omc - axis.z*s;
-		r.m[5] = c + axis.y*axis.y*omc;
-		r.m[6] = axis.z*axis.y*omc + axis.x*s;
+		result.m[4] = axis.x*axis.y*omc - axis.z*s;
+		result.m[5] = c + axis.y*axis.y*omc;
+		result.m[6] = axis.z*axis.y*omc + axis.x*s;
 
-		r.m[8]  = axis.x*axis.z*omc + axis.y*s;
-		r.m[9]  = axis.y*axis.z*omc - axis.x*s;
-		r.m[10] = c + axis.z*axis.z*omc;
+		result.m[8]  = axis.x*axis.z*omc + axis.y*s;
+		result.m[9]  = axis.y*axis.z*omc - axis.x*s;
+		result.m[10] = c + axis.z*axis.z*omc;
 
-		return r;
+		return result;
+	}
+
+	const float* data() const {
+		return &m[0];
 	}
 };
