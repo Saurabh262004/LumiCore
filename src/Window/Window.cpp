@@ -6,8 +6,7 @@
 #include <random>
 
 #include <Util.hpp>
-#include <Geometry/Vec3.hpp>
-#include <Geometry/InstanceData.hpp>
+#include <Geometry/Vec.hpp>
 #include <Geometry/Mesh.hpp>
 #include <Shader.hpp>
 #include <Window.hpp>
@@ -46,6 +45,8 @@ Window::Window(int width, int height, bool fullscreen) : width{width}, height{he
 			setInternalCallbacks();
 		}
 	}
+
+	camera.setViewportResolution((float)width, (float)height);
 }
 
 bool Window::initOpenGL(int width, int height) {
@@ -81,53 +82,64 @@ void Window::checkError(const char* where) {
 }
 
 void Window::loop() {
-	Vec3 cube[] = {
-		// Front face
-		{-0.5f, -0.5f,  0.5f}, { 0.5f, -0.5f,  0.5f}, { 0.5f,  0.5f,  0.5f},
-		{ 0.5f,  0.5f,  0.5f}, {-0.5f,  0.5f,  0.5f}, {-0.5f, -0.5f,  0.5f},
-		// Back face
-		{-0.5f, -0.5f, -0.5f}, {-0.5f,  0.5f, -0.5f}, { 0.5f,  0.5f, -0.5f},
-		{ 0.5f,  0.5f, -0.5f}, { 0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f},
-		// Left face
-		{-0.5f,  0.5f,  0.5f}, {-0.5f,  0.5f, -0.5f}, {-0.5f, -0.5f, -0.5f},
-		{-0.5f, -0.5f, -0.5f}, {-0.5f, -0.5f,  0.5f}, {-0.5f,  0.5f,  0.5f},
-		// Right face
-		{ 0.5f,  0.5f,  0.5f}, { 0.5f, -0.5f, -0.5f}, { 0.5f,  0.5f, -0.5f},
-		{ 0.5f, -0.5f, -0.5f}, { 0.5f,  0.5f,  0.5f}, { 0.5f, -0.5f,  0.5f},
-		// Top face
-		{-0.5f,  0.5f, -0.5f}, {-0.5f,  0.5f,  0.5f}, { 0.5f,  0.5f,  0.5f},
-		{ 0.5f,  0.5f,  0.5f}, { 0.5f,  0.5f, -0.5f}, {-0.5f,  0.5f, -0.5f},
-		// Bottom face
-		{-0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f,  0.5f},
-		{ 0.5f, -0.5f,  0.5f}, {-0.5f, -0.5f,  0.5f}, {-0.5f, -0.5f, -0.5f},
+	Vertex cube[] = {
+		// Front face — normal (0,0,1)
+		{{-0.5f,-0.5f, 0.5f},{0,0,1}}, {{0.5f,-0.5f, 0.5f},{0,0,1}}, {{0.5f, 0.5f, 0.5f},{0,0,1}},
+		{{0.5f, 0.5f, 0.5f},{0,0,1}}, {{-0.5f, 0.5f, 0.5f},{0,0,1}}, {{-0.5f,-0.5f, 0.5f},{0,0,1}},
+		// Back face — normal (0,0,-1)
+		{{-0.5f,-0.5f,-0.5f},{0,0,-1}}, {{-0.5f, 0.5f,-0.5f},{0,0,-1}}, {{0.5f, 0.5f,-0.5f},{0,0,-1}},
+		{{0.5f, 0.5f,-0.5f},{0,0,-1}}, {{0.5f,-0.5f,-0.5f},{0,0,-1}}, {{-0.5f,-0.5f,-0.5f},{0,0,-1}},
+		// Left face — normal (-1,0,0)
+		{{-0.5f, 0.5f, 0.5f},{-1,0,0}}, {{-0.5f, 0.5f,-0.5f},{-1,0,0}}, {{-0.5f,-0.5f,-0.5f},{-1,0,0}},
+		{{-0.5f,-0.5f,-0.5f},{-1,0,0}}, {{-0.5f,-0.5f, 0.5f},{-1,0,0}}, {{-0.5f, 0.5f, 0.5f},{-1,0,0}},
+		// Right face — normal (1,0,0)
+		{{0.5f, 0.5f, 0.5f},{1,0,0}}, {{0.5f,-0.5f,-0.5f},{1,0,0}}, {{0.5f, 0.5f,-0.5f},{1,0,0}},
+		{{0.5f,-0.5f,-0.5f},{1,0,0}}, {{0.5f, 0.5f, 0.5f},{1,0,0}}, {{0.5f,-0.5f, 0.5f},{1,0,0}},
+		// Top face — normal (0,1,0)
+		{{-0.5f, 0.5f,-0.5f},{0,1,0}}, {{-0.5f, 0.5f, 0.5f},{0,1,0}}, {{0.5f, 0.5f, 0.5f},{0,1,0}},
+		{{0.5f, 0.5f, 0.5f},{0,1,0}}, {{0.5f, 0.5f,-0.5f},{0,1,0}}, {{-0.5f, 0.5f,-0.5f},{0,1,0}},
+		// Bottom face — normal (0,-1,0)
+		{{-0.5f,-0.5f,-0.5f},{0,-1,0}}, {{0.5f,-0.5f,-0.5f},{0,-1,0}}, {{0.5f,-0.5f, 0.5f},{0,-1,0}},
+		{{0.5f,-0.5f, 0.5f},{0,-1,0}}, {{-0.5f,-0.5f, 0.5f},{0,-1,0}}, {{-0.5f,-0.5f,-0.5f},{0,-1,0}},
 	};
 
-	Mesh mesh(cube, std::size(cube));
+	VertexLayout vertexLayout {
+		sizeof(Vertex),
+		{
+			{ 0, 3, offsetof(Vertex, position) },
+			{ 6, 3, offsetof(Vertex, normal) }
+		}
+	};
 
-	std::size_t count = 1;
+	Mesh mesh(cube, std::size(cube), vertexLayout);
+
+	std::size_t count = 1000;
 
 	std::vector<InstanceData> instances;
 	instances.reserve(count);
 
-	//std::vector<float> xs       = Util::randFV(-1.0f, 1.0f, count);
-	//std::vector<float> ys       = Util::randFV(-1.0f, 1.0f, count);
-	//std::vector<float> zs       = Util::randFV(-1.0f, 1.0f, count);
-	std::vector<float> rotXs     = Util::randFV(0.0f, 6.2831853f, count);
-	std::vector<float> rotYs     = Util::randFV(0.0f, 6.2831853f, count);
-	std::vector<float> rotZs     = Util::randFV(0.0f, 6.2831853f, count);
+	std::vector<float> xs       = Util::randFV(-1.0f, 1.0f, count);
+	std::vector<float> ys       = Util::randFV(-1.0f, 1.0f, count);
+	std::vector<float> zs       = Util::randFV(-1.0f, 1.0f, count);
+	std::vector<float> rotXs    = Util::randFV(0.0f, 6.2831853f, count);
+	std::vector<float> rotYs    = Util::randFV(0.0f, 6.2831853f, count);
+	std::vector<float> rotZs    = Util::randFV(0.0f, 6.2831853f, count);
 	std::vector<float> reds     = Util::randFV(0.0f, 1.0f, count);
 	std::vector<float> greens   = Util::randFV(0.0f, 1.0f, count);
 	std::vector<float> blues    = Util::randFV(0.0f, 1.0f, count);
-	//std::vector<float> scaleXs  = Util::randFV(0.002f, 0.05f, count);
-	//std::vector<float> scaleYs  = Util::randFV(0.002f, 0.05f, count);
-	//std::vector<float> scaleZs  = Util::randFV(0.002f, 0.05f, count);
+	std::vector<float> scaleXs  = Util::randFV(0.002f, 0.05f, count);
+	std::vector<float> scaleYs  = Util::randFV(0.002f, 0.05f, count);
+	std::vector<float> scaleZs  = Util::randFV(0.002f, 0.05f, count);
 
 	for (std::size_t i = 0; i < count; ++i) {
-		//Mat4 translated = Mat4::translate(Vec3{xs[i], ys[i], zs[i]});
-		Mat4 translated = Mat4::identity();
+		Mat4 translated = Mat4::translate(Vec3{xs[i], ys[i], zs[i]});
+		//Mat4 translated = Mat4::identity();
+
 		Mat4 rotated = Mat4::rotateX(rotXs[i]) * Mat4::rotateY(rotYs[i]) * Mat4::rotateZ(rotZs[i]);
-		//Mat4 scaled = Mat4::scale(Vec3{scaleXs[i], scaleYs[i], scaleZs[i]});
-		Mat4 scaled = Mat4::identity();
+		//Mat4 rotated = Mat4::identity();
+
+		Mat4 scaled = Mat4::scale(Vec3{scaleXs[i], scaleYs[i], scaleZs[i]});
+		//Mat4 scaled = Mat4::identity();
 
 		Mat4 model = translated * rotated * scaled;
 
@@ -149,7 +161,7 @@ void Window::loop() {
 	float stopPoint = M_PI * 2;
 	float step = 0.002;
 
-	camera.setPosition({0.0f, 0.0f, 3.0f});
+	//camera.setPosition({0.0f, 0.0f, 3.0f});
 
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -165,8 +177,13 @@ void Window::loop() {
 			lastTime += 1.0;
 		}
 
+		camera.updateViewProjection();
+
 		shader.use();
+
 		shader.setMat4("viewProjection", camera.getViewProjection());
+		shader.setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f});
+
 		mesh.draw(instances.size());
 
 		float roll = camera.getRoll();
@@ -175,12 +192,12 @@ void Window::loop() {
 			roll += step;
 
 			camera.setRoll(roll);
-			//camera.setPitch(roll);
-			//camera.setYaw(roll);
+			camera.setPitch(roll);
+			camera.setYaw(roll);
 		} else {
 			camera.setRoll(stopPoint);
-			//camera.setPitch(stopPoint);
-			//camera.setYaw(stopPoint);
+			camera.setPitch(stopPoint);
+			camera.setYaw(stopPoint);
 		}
 
 		GLenum err = glGetError();

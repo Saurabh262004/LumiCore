@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Geometry/Vec3.hpp>
-#include <Geometry/Vec4.hpp>
+#include <Geometry/Vec.hpp>
 #include <cmath>
 
 struct Mat4 {

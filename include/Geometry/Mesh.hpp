@@ -3,12 +3,19 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <Geometry/Vec3.hpp>
-#include <Geometry/InstanceData.hpp>
+#include <Geometry/Vec.hpp>
+#include <Geometry/Mat.hpp>
+#include <Geometry/Vertex.hpp>
+
+struct InstanceData {
+	Mat4 model; // position + rotation + scale
+	Vec3 color;
+};
 
 class Mesh {
 public:
-	Mesh(const Vec3 *verts, std::size_t count);
+	Mesh(const void* vertexData, std::size_t vertexCount, const VertexLayout& layout);
+	//Mesh(const Vec3 *verts, std::size_t count);
 	~Mesh();
 
 	Mesh(const Mesh&) = delete;

@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <Geometry/Mat4.hpp>
+#include <Geometry/Mat.hpp>
 
 class Shader {
 public:
@@ -13,6 +13,7 @@ public:
 
 	~Shader();
 
+	void setVec3(const std::string& name, const Vec3& vec) const;
 	void setMat4(const std::string& name, const Mat4& mat) const;
 
 	void use() const;

@@ -2,26 +2,27 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <Geometry/Vec.hpp>
+#include <Geometry/Vertex.hpp>
 #include <Geometry/Mesh.hpp>
-#include <Geometry/Vec3.hpp>
-#include <Geometry/InstanceData.hpp>
 
-Mesh::Mesh(const Vec3* verts, std::size_t count) : vertexCount{count} {
-	// Create VBO + VAO
+Mesh::Mesh(const void* vertexData, std::size_t vertexCount, const VertexLayout& layout) : vertexCount{vertexCount} {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 
-	// Bind VAO
 	glBindVertexArray(VAO);
-
-	// Bind VBO
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-	glBufferData(GL_ARRAY_BUFFER, count * sizeof(Vec3), verts, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexCount * layout.stride, vertexData, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3), (void*)0);
+	for (const auto& attr : layout.attributes) {
+		glVertexAttribPointer(
+			attr.location, attr.componentCount, GL_FLOAT, GL_FALSE,
+			layout.stride, (void*)attr.offset
+		);
 
-	glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(attr.location);
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);

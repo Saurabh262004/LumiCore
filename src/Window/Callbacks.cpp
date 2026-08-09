@@ -197,6 +197,7 @@ void Window::framebufferSizeCallback(int width, int height) {
 	this->height = height;
 
 	glViewport(0, 0, width, height);
+	camera.setViewportResolution((float)width, (float)height);
 
 	if (customFramebufferSizeCallback)
 		customFramebufferSizeCallback(window, width, height);
