@@ -68,6 +68,12 @@ void Mesh::setInstanceData(const InstanceData* data, std::size_t count) {
 	glBindVertexArray(0);
 }
 
+void Mesh::updateInstanceData(const InstanceData* data, std::size_t count) {
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(InstanceData), data);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 Mesh::~Mesh() {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);

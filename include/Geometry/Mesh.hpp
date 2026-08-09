@@ -25,6 +25,7 @@ public:
 	Mesh& operator=(Mesh&& other) noexcept;
 
 	void setInstanceData(const InstanceData* data, std::size_t count);
+	void updateInstanceData(const InstanceData* data, std::size_t count);
 	void draw(std::size_t instanceCount) const;
 
 private:
