@@ -15,7 +15,7 @@ private:
 	float farPlane = 100.0f;
 
 	float viewportWidth = 800.0f;
-    float viewportHeight = 600.0f;
+	float viewportHeight = 600.0f;
 
 	Mat4 viewProjection;
 

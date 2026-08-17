@@ -4,7 +4,6 @@
 #include <Util.hpp>
 
 Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
-	// compile shaders
 	std::string vertexCode = Util::readFile(vertexPath);
 	const char* vertexSource = vertexCode.c_str();
 
@@ -21,7 +20,6 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 
 	glCompileShader(fragmentShader);
 
-	// Link Program
 	program = glCreateProgram();
 
 	glAttachShader(program, vertexShader);
@@ -29,7 +27,6 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 
 	glLinkProgram(program);
 
-	// Shaders are no longer needed after linking
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
 }
@@ -40,8 +37,8 @@ Shader::~Shader() {
 }
 
 void Shader::setVec3(const std::string& name, const Vec3& vec) const {
-    GLint location = glGetUniformLocation(program, name.c_str());
-    glUniform3f(location, vec.x, vec.y, vec.z);
+	GLint location = glGetUniformLocation(program, name.c_str());
+	glUniform3f(location, vec.x, vec.y, vec.z);
 }
 
 void Shader::setMat4(const std::string& name, const Mat4& mat) const {

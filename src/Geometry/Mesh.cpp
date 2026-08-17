@@ -1,0 +1,134 @@
+#include <iostream>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+#include <Geometry/Vec.hpp>
+#include <Geometry/Vertex.hpp>
+#include <Geometry/Mesh.hpp>
+
+Mesh::Mesh(const void* vertexData, std::size_t vertexCount, const VertexLayout& layout) : Mesh(vertexData, vertexCount, nullptr, 0, layout) {}
+
+Mesh::Mesh(const void* vertexData, std::size_t vertexCount, const std::uint32_t* indices, std::size_t indexCount, const VertexLayout& layout) : vertexCount{vertexCount}, indexCount{indexCount} {
+	glGenVertexArrays(1, &VAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, vertexCount * layout.stride, vertexData, GL_STATIC_DRAW);
+
+	GLuint maxLocation = 0;
+	for (const auto& attr : layout.attributes) {
+		glVertexAttribPointer(attr.location, attr.componentCount, GL_FLOAT, GL_FALSE, layout.stride, (void*)attr.offset);
+		glEnableVertexAttribArray(attr.location);
+		maxLocation = std::max(maxLocation, attr.location + 1);
+	}
+	instanceBaseLocation = maxLocation;
+
+	if (indices && indexCount > 0) {
+		glGenBuffers(1, &EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * sizeof(std::uint32_t), indices, GL_STATIC_DRAW);
+	}
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Mesh::draw(std::size_t instanceCount) const {
+	glBindVertexArray(VAO);
+
+	if (EBO != 0) {
+		glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(instanceCount));
+	} else {
+		glDrawArraysInstanced(GL_TRIANGLES, 0, static_cast<GLsizei>(vertexCount), static_cast<GLsizei>(instanceCount));
+	}
+
+	glBindVertexArray(0);
+}
+
+void Mesh::setInstanceData(const InstanceData* data, std::size_t count) {
+	glBindVertexArray(VAO);
+
+	if (instanceVBO == 0) {
+		glGenBuffers(1, &instanceVBO);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(InstanceData), data, GL_STATIC_DRAW);
+
+	std::size_t vec4Size = sizeof(Vec4);
+
+	for (int i = 0; i < 4; ++i) {
+		GLuint loc = instanceBaseLocation + i;
+		glVertexAttribPointer(loc, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (void*)(offsetof(InstanceData, model) + i * vec4Size));
+
+		glEnableVertexAttribArray(loc);
+		glVertexAttribDivisor(loc, 1);
+	}
+
+	// color -> next location after the 4 matrix columns
+	GLuint colorLoc = instanceBaseLocation + 4;
+
+	glVertexAttribPointer(
+		colorLoc, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData),
+		(void*)offsetof(InstanceData, color)
+	);
+
+	glEnableVertexAttribArray(colorLoc);
+	glVertexAttribDivisor(colorLoc, 1);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+}
+
+void Mesh::updateInstanceData(const InstanceData* data, std::size_t count) {
+	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(InstanceData), data);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+Mesh::~Mesh() {
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
+	glDeleteBuffers(1, &instanceVBO);
+}
+
+Mesh::Mesh(Mesh&& other) noexcept
+	: VAO{other.VAO}, VBO{other.VBO}, EBO{other.EBO}, instanceVBO{other.instanceVBO},
+	  vertexCount{other.vertexCount}, indexCount{other.indexCount},
+	  instanceBaseLocation{other.instanceBaseLocation}
+{
+	other.VAO = 0;
+	other.VBO = 0;
+	other.EBO = 0;
+	other.instanceVBO = 0;
+	other.vertexCount = 0;
+	other.indexCount = 0;
+	other.instanceBaseLocation = 1;
+}
+
+Mesh& Mesh::operator=(Mesh&& other) noexcept {
+	if (this != &other) {
+		glDeleteVertexArrays(1, &VAO);
+		glDeleteBuffers(1, &VBO);
+		glDeleteBuffers(1, &EBO);
+		glDeleteBuffers(1, &instanceVBO);
+
+		VAO = other.VAO;
+		VBO = other.VBO;
+		EBO = other.EBO;
+		instanceVBO = other.instanceVBO;
+		vertexCount = other.vertexCount;
+		indexCount = other.indexCount;
+		instanceBaseLocation = other.instanceBaseLocation;
+
+		other.VAO = 0;
+		other.VBO = 0;
+		other.EBO = 0;
+		other.instanceVBO = 0;
+		other.vertexCount = 0;
+		other.indexCount = 0;
+		other.instanceBaseLocation = 1;
+	}
+	return *this;
+}

@@ -209,6 +209,57 @@ void Window::windowContentScaleCallback(float xscale, float yscale) {
 }
 
 void Window::keyCallback(int key, int scancode, int action, int mods) {
+	if (action == 1 || action == 2) {
+		float step = 0.05f;
+
+		if (key == GLFW_KEY_W) {
+			Vec3 pos = camera.getPosition();
+			pos.z -= step;
+			camera.setPosition(pos);
+		} else if (key == GLFW_KEY_S) {
+			Vec3 pos = camera.getPosition();
+			pos.z += step;
+			camera.setPosition(pos);
+		} else if (key == GLFW_KEY_A) {
+			Vec3 pos = camera.getPosition();
+			pos.x -= step;
+			camera.setPosition(pos);
+		} else if (key == GLFW_KEY_D) {
+			Vec3 pos = camera.getPosition();
+			pos.x += step;
+			camera.setPosition(pos);
+		} else if (key == GLFW_KEY_SPACE) {
+			Vec3 pos = camera.getPosition();
+			pos.y += step;
+			camera.setPosition(pos);
+		} else if (key == GLFW_KEY_LEFT_SHIFT) {
+			Vec3 pos = camera.getPosition();
+			pos.y -= step;
+			camera.setPosition(pos);
+		} else if (key == GLFW_KEY_J) {
+			float yaw = camera.getYaw();
+			yaw += step;
+			camera.setYaw(yaw);
+		} else if (key == GLFW_KEY_L) {
+			float yaw = camera.getYaw();
+			yaw -= step;
+			camera.setYaw(yaw);
+		} else if (key == GLFW_KEY_I) {
+			float pitch = camera.getPitch();
+			pitch += step;
+			camera.setPitch(pitch);
+		} else if (key == GLFW_KEY_K) {
+			float pitch = camera.getPitch();
+			pitch -= step;
+			camera.setPitch(pitch);
+		} else if (key == GLFW_KEY_BACKSPACE) {
+			camera.setPosition(Vec3{0.0f, 0.0f, 0.0f});
+			camera.setYaw(0.0f);
+			camera.setPitch(0.0f);
+			camera.setRoll(0.0f);
+		}
+	}
+
 	if (customKeyCallback)
 		customKeyCallback(window, key, scancode, action, mods);
 }

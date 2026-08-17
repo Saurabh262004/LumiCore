@@ -3,6 +3,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <cstdint>
+
 #include <Geometry/Vec.hpp>
 #include <Geometry/Mat.hpp>
 #include <Geometry/Vertex.hpp>
@@ -15,6 +17,7 @@ struct InstanceData {
 class Mesh {
 public:
 	Mesh(const void* vertexData, std::size_t vertexCount, const VertexLayout& layout);
+	Mesh(const void* vertexData, std::size_t vertexCount, const std::uint32_t* indices, std::size_t indexCount, const VertexLayout& layout);
 	//Mesh(const Vec3 *verts, std::size_t count);
 	~Mesh();
 
@@ -31,6 +34,9 @@ public:
 private:
 	GLuint VAO{0};
 	GLuint VBO{0};
+	GLuint EBO{0};
 	GLuint instanceVBO{0};
+	GLuint instanceBaseLocation{1};
 	std::size_t vertexCount{0};
+	std::size_t indexCount{0};
 };
