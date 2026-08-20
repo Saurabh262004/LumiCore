@@ -2,6 +2,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <Camera.hpp>
+#include <Geometry/Model.hpp>
 #include <Window.hpp>
 
 //void resize(GLFWwindow* window, int width, int height) {
@@ -37,6 +39,17 @@ int main() {
 	}
 
 	Window window(1280, 720);
+	
+	Camera cam;
+	cam.setViewportResolution((float)1280, (float)720);
+	cam.setPosition({0.0f, 1.0f, 3.0f});
+
+	Model citlali("assets/models/citlali/obj");
+	citlali.addNormalInstance();
+	citlali.uploadInstances();
+
+	window.addCamera(cam, "cam1");
+	window.addModel(std::move(citlali), "cam1", "citlali");
 
 	//window.setFramebufferSizeCallback(resize);
 	//window.setKeyCallback(keyCallback);

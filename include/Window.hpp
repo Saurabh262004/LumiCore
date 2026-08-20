@@ -1,7 +1,12 @@
 #pragma once
 
+#include <unordered_map>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+
+#include <Geometry/Mesh.hpp>
+#include <Geometry/Model.hpp>
 #include <Camera.hpp>
 
 class Window {
@@ -9,12 +14,49 @@ public:
 	Window(int width = 854, int height = 480, bool fullscreen = false);
 	~Window();
 
-	int width{};
-	int height{};
-	bool fullscreen{};
-	Camera camera;
-
 	GLFWwindow *getWindow();
+
+	int getWidth() { return width; }
+	int getHeight() { return height; }
+	bool getFullscreen() { return fullscreen; }
+
+	bool hasCamera(const std::string& id) const {
+		return cameras.find(id) != cameras.end();
+	}
+
+	bool hasMeshMapForCam(const std::string& id) const {
+		return meshes.find(id) != meshes.end();
+	}
+
+	bool hasModelMapForCam(const std::string& id) const {
+		return models.find(id) != models.end();
+	}
+
+	void addCamera(Camera camera, std::string id) {
+		cameras.insert_or_assign(std::move(id), std::move(camera));
+	}
+
+	void addMesh(Mesh mesh, std::string camID, std::string meshID) {
+		if (!hasCamera(camID)) {
+			throw std::runtime_error("addMesh: no camera registered with id \"" + camID + "\"");
+		}
+
+		meshes[camID].insert_or_assign(
+			std::move(meshID),
+			std::move(mesh)
+		);
+	}
+
+	void addModel(Model model, std::string camID, std::string modelID) {
+		if (!hasCamera(camID)) {
+			throw std::runtime_error("addModel: no camera registered with id \"" + camID + "\"");
+		}
+
+		models[camID].insert_or_assign(
+			std::move(modelID),
+			std::move(model)
+		);
+	}
 
 	// Window events
 	void setWindowPosCallback(GLFWwindowposfun callback);					// Window moved
@@ -44,6 +86,15 @@ public:
 
 private:
 	GLFWwindow *window;
+
+	int width{};
+	int height{};
+	bool fullscreen{};
+
+	std::unordered_map<std::string, Camera> cameras;
+	std::unordered_map<std::string, std::unordered_map<std::string, Mesh>> meshes;
+	std::unordered_map<std::string, std::unordered_map<std::string, Model>> models;
+
 	bool initOpenGL(int width, int height);
 	void checkError(const char* where);
 

@@ -33,19 +33,7 @@ Mesh::Mesh(const void* vertexData, std::size_t vertexCount, const std::uint32_t*
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Mesh::draw(std::size_t instanceCount) const {
-	glBindVertexArray(VAO);
-
-	if (EBO != 0) {
-		glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(instanceCount));
-	} else {
-		glDrawArraysInstanced(GL_TRIANGLES, 0, static_cast<GLsizei>(vertexCount), static_cast<GLsizei>(instanceCount));
-	}
-
-	glBindVertexArray(0);
-}
-
-void Mesh::setInstanceData(const InstanceData* data, std::size_t count) {
+void Mesh::setInstanceData(const InstanceData* data, std::size_t count, GLenum usage) {
 	glBindVertexArray(VAO);
 
 	if (instanceVBO == 0) {
@@ -53,7 +41,7 @@ void Mesh::setInstanceData(const InstanceData* data, std::size_t count) {
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-	glBufferData(GL_ARRAY_BUFFER, count * sizeof(InstanceData), data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(InstanceData), data, usage);
 
 	std::size_t vec4Size = sizeof(Vec4);
 
@@ -65,7 +53,6 @@ void Mesh::setInstanceData(const InstanceData* data, std::size_t count) {
 		glVertexAttribDivisor(loc, 1);
 	}
 
-	// color -> next location after the 4 matrix columns
 	GLuint colorLoc = instanceBaseLocation + 4;
 
 	glVertexAttribPointer(
@@ -78,12 +65,32 @@ void Mesh::setInstanceData(const InstanceData* data, std::size_t count) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	instanceCount += count;
+}
+
+void Mesh::addNormalInstance() {
+	InstanceData instance = { Mat4::identity(), {1, 1, 1} };
+
+	addInstance(instance);
 }
 
 void Mesh::updateInstanceData(const InstanceData* data, std::size_t count) {
 	glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(InstanceData), data);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void Mesh::draw() const {
+	glBindVertexArray(VAO);
+
+	if (EBO != 0) {
+		glDrawElementsInstanced(GL_TRIANGLES, static_cast<GLsizei>(indexCount), GL_UNSIGNED_INT, nullptr, static_cast<GLsizei>(instanceCount));
+	} else {
+		glDrawArraysInstanced(GL_TRIANGLES, 0, static_cast<GLsizei>(vertexCount), static_cast<GLsizei>(instanceCount));
+	}
+
+	glBindVertexArray(0);
 }
 
 Mesh::~Mesh() {
@@ -95,7 +102,7 @@ Mesh::~Mesh() {
 
 Mesh::Mesh(Mesh&& other) noexcept
 	: VAO{other.VAO}, VBO{other.VBO}, EBO{other.EBO}, instanceVBO{other.instanceVBO},
-	  vertexCount{other.vertexCount}, indexCount{other.indexCount},
+	  vertexCount{other.vertexCount}, indexCount{other.indexCount}, instanceCount{other.instanceCount},
 	  instanceBaseLocation{other.instanceBaseLocation}
 {
 	other.VAO = 0;
@@ -104,6 +111,7 @@ Mesh::Mesh(Mesh&& other) noexcept
 	other.instanceVBO = 0;
 	other.vertexCount = 0;
 	other.indexCount = 0;
+	other.instanceCount = 0;
 	other.instanceBaseLocation = 1;
 }
 
@@ -120,6 +128,7 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 		instanceVBO = other.instanceVBO;
 		vertexCount = other.vertexCount;
 		indexCount = other.indexCount;
+		instanceCount = other.instanceCount;
 		instanceBaseLocation = other.instanceBaseLocation;
 
 		other.VAO = 0;
@@ -128,6 +137,7 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 		other.instanceVBO = 0;
 		other.vertexCount = 0;
 		other.indexCount = 0;
+		other.instanceCount = 0;
 		other.instanceBaseLocation = 1;
 	}
 	return *this;

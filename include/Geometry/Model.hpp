@@ -12,14 +12,42 @@ class Model {
 public:
 	explicit Model(const std::string& path);
 
+	void addInstance(const InstanceData& instance) {
+		for (auto& mesh : meshes) mesh.addInstance(instance);
+	}
+
+	void reserveInstances(std::size_t count) {
+		for (auto& mesh : meshes) mesh.reserveInstances(count);
+	}
+
+	void clearInstances() {
+		for (auto& mesh : meshes) mesh.clearInstances();
+	}
+
+	void uploadInstances(GLenum usage = GL_STATIC_DRAW) {
+		for (auto& mesh : meshes) mesh.uploadInstances(usage);
+	}
+
+	void addNormalInstance() {
+		for (auto& mesh : meshes) mesh.addNormalInstance();
+	}
+
+	void setInstanceData(const InstanceData* data, std::size_t count, GLenum usage = GL_STATIC_DRAW) {
+		for (auto& mesh : meshes) mesh.setInstanceData(data, count, usage);
+	}
+
+	void draw() const {
+		for (const auto& mesh : meshes) mesh.draw();
+	}
+
+	void updateInstanceData(const InstanceData* data, std::size_t count) {
+		for (auto& mesh : meshes) mesh.updateInstanceData(data, count);
+	}
+
 	Model(const Model&) = delete;
 	Model& operator=(const Model&) = delete;
 	Model(Model&&) noexcept = default;
 	Model& operator=(Model&&) noexcept = default;
-
-	void draw(std::size_t instanceCount) const;
-	void setInstanceData(const InstanceData* data, std::size_t count);
-	void updateInstanceData(const InstanceData* data, std::size_t count);
 
 private:
 	std::vector<Mesh> meshes;

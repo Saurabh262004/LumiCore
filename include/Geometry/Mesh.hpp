@@ -1,9 +1,10 @@
 #pragma once
 
+#include <cstdint>
+#include <vector>
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
-#include <cstdint>
 
 #include <Geometry/Vec.hpp>
 #include <Geometry/Mat.hpp>
@@ -18,18 +19,22 @@ class Mesh {
 public:
 	Mesh(const void* vertexData, std::size_t vertexCount, const VertexLayout& layout);
 	Mesh(const void* vertexData, std::size_t vertexCount, const std::uint32_t* indices, std::size_t indexCount, const VertexLayout& layout);
-	//Mesh(const Vec3 *verts, std::size_t count);
 	~Mesh();
+
+	void addInstance(const InstanceData& instance) { instanceBuffer.push_back(instance); }
+	void reserveInstances(std::size_t count) { instanceBuffer.reserve(count); }
+	void clearInstances() { instanceBuffer.clear(); }
+	void uploadInstances(GLenum usage = GL_STATIC_DRAW) { setInstanceData(instanceBuffer.data(), instanceBuffer.size(), usage); }
+	void addNormalInstance();
+
+	void setInstanceData(const InstanceData* data, std::size_t count, GLenum usage = GL_STATIC_DRAW);
+	void updateInstanceData(const InstanceData* data, std::size_t count);
+	void draw() const;
 
 	Mesh(const Mesh&) = delete;
 	Mesh& operator=(const Mesh&) = delete;
-
 	Mesh(Mesh&& other) noexcept;
 	Mesh& operator=(Mesh&& other) noexcept;
-
-	void setInstanceData(const InstanceData* data, std::size_t count);
-	void updateInstanceData(const InstanceData* data, std::size_t count);
-	void draw(std::size_t instanceCount) const;
 
 private:
 	GLuint VAO{0};
@@ -39,4 +44,6 @@ private:
 	GLuint instanceBaseLocation{1};
 	std::size_t vertexCount{0};
 	std::size_t indexCount{0};
+	std::size_t instanceCount{0};
+	std::vector<InstanceData> instanceBuffer;
 };

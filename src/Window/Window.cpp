@@ -47,8 +47,6 @@ Window::Window(int width, int height, bool fullscreen) : width{width}, height{he
 			setInternalCallbacks();
 		}
 	}
-
-	camera.setViewportResolution((float)width, (float)height);
 }
 
 bool Window::initOpenGL(int width, int height) {
@@ -84,30 +82,30 @@ void Window::checkError(const char* where) {
 }
 
 void Window::loop() {
-	std::vector<InstanceData> instances = {
-		{ Mat4::translate({0, 0, 0}), {1, 1, 1} },
-	};
-
-	Model pyramid("assets/Citlali/obj");
-
-	pyramid.setInstanceData(instances.data(), instances.size());
-
 	Shader shader("assets/shaders/shader.vert", "assets/shaders/shader.frag");
-
-	camera.setPosition({0.0f, 1.0f, 3.0f});
 
 	while (!glfwWindowShouldClose(window)) {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		camera.updateViewProjection();
+		//camera.updateViewProjection();
 
 		shader.use();
 
-		shader.setMat4("viewProjection", camera.getViewProjection());
 		shader.setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f});
 
-		pyramid.draw(instances.size());
+		for (auto& [camID, camera] : cameras) {
+			camera.updateViewProjection();
+			shader.setMat4("viewProjection", camera.getViewProjection());
+
+			for (auto& [meshID, mesh] : meshes[camID]) {
+				mesh.draw();
+			}
+
+			for (auto& [modelID, model] : models[camID]) {
+				model.draw();
+			}
+		}
 
 		GLenum err = glGetError();
 

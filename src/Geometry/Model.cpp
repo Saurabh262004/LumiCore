@@ -1,4 +1,4 @@
-//#include <iostream>
+#include <iostream>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -51,20 +51,5 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 			indices.push_back(face.mIndices[j]);
 	}
 
-	//std::cout << "Mesh: " << vertices.size() << " verts, " << indices.size() << " indices\n";
-	//std::cout << "Has vertex colors: " << mesh->HasVertexColors(0) << '\n';
-
 	return Mesh(vertices.data(), vertices.size(), indices.data(), indices.size(), Vertex::layout());
-}
-
-void Model::draw(std::size_t instanceCount) const {
-	for (const auto& mesh : meshes) mesh.draw(instanceCount);
-}
-
-void Model::setInstanceData(const InstanceData* data, std::size_t count) {
-	for (auto& mesh : meshes) mesh.setInstanceData(data, count);
-}
-
-void Model::updateInstanceData(const InstanceData* data, std::size_t count) {
-	for (auto& mesh : meshes) mesh.updateInstanceData(data, count);
 }
