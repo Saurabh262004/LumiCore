@@ -1,4 +1,5 @@
 #include <iostream>
+#include <utility>
 
 #include <Shader.hpp>
 #include <Util.hpp>
@@ -48,4 +49,16 @@ void Shader::setMat4(const std::string& name, const Mat4& mat) const {
 
 void Shader::use() const {
 	glUseProgram(program);
+}
+
+Shader::Shader(Shader&& other) noexcept : program{std::exchange(other.program, 0)} {}
+
+Shader& Shader::operator=(Shader&& other) noexcept {
+	if (this != &other) {
+		if (program != 0) glDeleteProgram(program);
+
+		program = std::exchange(other.program, 0);
+	}
+
+	return *this;
 }

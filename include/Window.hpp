@@ -5,9 +5,20 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <Shader.hpp>
 #include <Geometry/Mesh.hpp>
 #include <Geometry/Model.hpp>
 #include <Camera.hpp>
+
+struct MeshEntry {
+	std::string id;
+	Mesh mesh;
+};
+
+struct ModelEntry {
+	std::string id;
+	Model model;
+};
 
 class Window {
 public:
@@ -24,38 +35,54 @@ public:
 		return cameras.find(id) != cameras.end();
 	}
 
-	bool hasMeshMapForCam(const std::string& id) const {
-		return meshes.find(id) != meshes.end();
-	}
-
-	bool hasModelMapForCam(const std::string& id) const {
-		return models.find(id) != models.end();
+	bool hasShader(const std::string& id) const {
+		return shaders.find(id) != shaders.end();
 	}
 
 	void addCamera(Camera camera, std::string id) {
 		cameras.insert_or_assign(std::move(id), std::move(camera));
 	}
 
-	void addMesh(Mesh mesh, std::string camID, std::string meshID) {
+	void addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath) {
+		shaders.try_emplace(
+			std::move(id),
+			vertexPath,
+			fragmentPath
+		);
+	}
+
+	void addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID) {
+		if (!hasShader(shaderID)) {
+			throw std::runtime_error("addMesh: no shader registered with id \"" + shaderID + "\"");
+		}
+
 		if (!hasCamera(camID)) {
 			throw std::runtime_error("addMesh: no camera registered with id \"" + camID + "\"");
 		}
 
-		meshes[camID].insert_or_assign(
+		MeshEntry meshE = {
 			std::move(meshID),
-			std::move(mesh)
-		);
+			std::move(mesh),
+		};
+
+		meshes[shaderID][camID].push_back(std::move(meshE));
 	}
 
-	void addModel(Model model, std::string camID, std::string modelID) {
+	void addModel(Model model, std::string shaderID, std::string camID, std::string modelID) {
+		if (!hasShader(shaderID)) {
+			throw std::runtime_error("addModel: no shader registered with id \"" + shaderID + "\"");
+		}
+
 		if (!hasCamera(camID)) {
 			throw std::runtime_error("addModel: no camera registered with id \"" + camID + "\"");
 		}
 
-		models[camID].insert_or_assign(
+		ModelEntry modelE = {
 			std::move(modelID),
-			std::move(model)
-		);
+			std::move(model),
+		};
+
+		models[shaderID][camID].push_back(std::move(modelE));
 	}
 
 	// Window events
@@ -92,16 +119,18 @@ private:
 	bool fullscreen{};
 
 	std::unordered_map<std::string, Camera> cameras;
-	std::unordered_map<std::string, std::unordered_map<std::string, Mesh>> meshes;
-	std::unordered_map<std::string, std::unordered_map<std::string, Model>> models;
+	std::unordered_map<std::string, Shader> shaders;
+
+	// map<shaderID, map<CamID, vector<{objectID, object}>>>
+	std::unordered_map<std::string, std::unordered_map<std::string, std::vector<MeshEntry>>> meshes;
+	std::unordered_map<std::string, std::unordered_map<std::string, std::vector<ModelEntry>>> models;
 
 	bool initOpenGL(int width, int height);
-	void checkError(const char* where);
+	bool checkError(const char* where);
 
 	void setInternalCallbacks();
 
 	// static functions to rout glfw event callbacks through
-
 	static void staticWindowPosCallback(GLFWwindow *glfwWindow, int xpos, int ypos);
 	static void staticWindowSizeCallback(GLFWwindow *glfwWindow, int width, int height);
 	static void staticWindowCloseCallback(GLFWwindow *glfwWindow);
@@ -120,7 +149,6 @@ private:
 	static void staticDropCallback(GLFWwindow *glfwWindow, int path_count, const char **paths);
 
 	// internal event functions
-
 	void windowPosCallback(int xpos, int ypos);
 	void windowSizeCallback(int width, int height);
 	void windowCloseCallback();
@@ -139,7 +167,6 @@ private:
 	void dropCallback(int path_count, const char **paths);
 
 	// custom event functions
-
 	GLFWwindowposfun customWindowPosCallback = nullptr;
 	GLFWwindowsizefun customWindowSizeCallback = nullptr;
 	GLFWwindowclosefun customWindowCloseCallback = nullptr;

@@ -2,9 +2,11 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <Shader.hpp>
 #include <Camera.hpp>
 #include <Geometry/Model.hpp>
 #include <Window.hpp>
+
 
 //void resize(GLFWwindow* window, int width, int height) {
 //	glViewport(0, 0, width, height);
@@ -32,31 +34,36 @@
 //}
 
 int main() {
-	if (!glfwInit())
-	{
+	if (!glfwInit()) {
 		std::cerr << "Failed to initialize GLFW\n";
 		return -1;
 	}
 
-	Window window(1280, 720);
-	
-	Camera cam;
-	cam.setViewportResolution((float)1280, (float)720);
-	cam.setPosition({0.0f, 1.0f, 3.0f});
+	{
+		Window window(1280, 720);
 
-	Model citlali("assets/models/citlali/obj");
-	citlali.addNormalInstance();
-	citlali.uploadInstances();
+		//Shader shader1("assets/shaders/shader.vert", "assets/shaders/shader.frag");
 
-	window.addCamera(cam, "cam1");
-	window.addModel(std::move(citlali), "cam1", "citlali");
+		Camera cam;
+		cam.setViewportResolution((float)1280, (float)720);
+		cam.setPosition({0.0f, 1.0f, 3.0f});
 
-	//window.setFramebufferSizeCallback(resize);
-	//window.setKeyCallback(keyCallback);
-	//window.setCursorPosCallback(mouseMotionCallback);
-	//window.setMouseButtonCallback(mouseButtonCallback);
+		Model model1("assets/models/pyramid/obj");
+		model1.addNormalInstance();
+		model1.uploadInstances();
 
-	window.loop();
+		//window.addShader(std::move(shader1), "shader1");
+		window.addShader("shader1", "assets/shaders/shader.vert", "assets/shaders/shader.frag");
+		window.addCamera(std::move(cam), "cam1");
+		window.addModel(std::move(model1), "shader1", "cam1", "model1");
+
+		//window.setFramebufferSizeCallback(resize);
+		//window.setKeyCallback(keyCallback);
+		//window.setCursorPosCallback(mouseMotionCallback);
+		//window.setMouseButtonCallback(mouseButtonCallback);
+
+		window.loop();
+	}
 
 	glfwTerminate();
 }

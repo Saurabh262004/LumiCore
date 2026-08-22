@@ -1,16 +1,10 @@
+#include <stdexcept>
 #include <iostream>
 #include <memory>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <vector>
-#include <random>
 
-#include <Util.hpp>
-#include <Geometry/Vec.hpp>
-#include <Geometry/Mesh.hpp>
-#include <Geometry/Model.hpp>
-#include <Shader.hpp>
 #include <Window.hpp>
 
 Window::Window(int width, int height, bool fullscreen) : width{width}, height{height}, fullscreen{fullscreen} {
@@ -37,11 +31,13 @@ Window::Window(int width, int height, bool fullscreen) : width{width}, height{he
 	}
 
 	if (!window) {
-		std::cerr << "Failed to create window\n";
-		window = nullptr;
+		glfwTerminate();
+		throw std::runtime_error("Failed to create GLFW window");
 	} else {
 		if (!initOpenGL(width, height)) {
-			std::cerr << "Failed to initiate OpenGL\n";
+			glfwDestroyWindow(window);
+			glfwTerminate();
+			throw std::runtime_error("Failed to initialize OpenGL");
 		} else {
 			glfwSetWindowUserPointer(window, this);
 			setInternalCallbacks();
@@ -52,8 +48,7 @@ Window::Window(int width, int height, bool fullscreen) : width{width}, height{he
 bool Window::initOpenGL(int width, int height) {
 	glfwMakeContextCurrent(window);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-	{
+	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		std::cerr << "Failed to initialize GLAD\n";
 		return false;
 	}
@@ -74,53 +69,19 @@ bool Window::initOpenGL(int width, int height) {
 	return true;
 }
 
-void Window::checkError(const char* where) {
+bool Window::checkError(const char* where) {
 	GLenum err = glGetError();
 
-	if (err != GL_NO_ERROR)
+	if (err != GL_NO_ERROR) {
 		std::cout << where << " : " << err << '\n';
-}
-
-void Window::loop() {
-	Shader shader("assets/shaders/shader.vert", "assets/shaders/shader.frag");
-
-	while (!glfwWindowShouldClose(window)) {
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-		//camera.updateViewProjection();
-
-		shader.use();
-
-		shader.setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f});
-
-		for (auto& [camID, camera] : cameras) {
-			camera.updateViewProjection();
-			shader.setMat4("viewProjection", camera.getViewProjection());
-
-			for (auto& [meshID, mesh] : meshes[camID]) {
-				mesh.draw();
-			}
-
-			for (auto& [modelID, model] : models[camID]) {
-				model.draw();
-			}
-		}
-
-		GLenum err = glGetError();
-
-		if (err != GL_NO_ERROR) {
-			std::cout << "OpenGL Error: " << err << '\n';
-		}
-
-		glfwSwapBuffers(window);
-		glfwPollEvents();
+		return true;
 	}
+
+	return false;
 }
 
 Window::~Window() {
-	std::cout << "Destroying GLFW\n";
-
+	std::cout << "Destroying window\n";
 	if (window) glfwDestroyWindow(window);
 }
 

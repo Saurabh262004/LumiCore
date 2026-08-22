@@ -1,5 +1,4 @@
-#ifndef SHADER_HPP
-#define SHADER_HPP
+#pragma once
 
 #include <string>
 #include <glad/glad.h>
@@ -13,6 +12,12 @@ public:
 
 	~Shader();
 
+	Shader(const Shader&) = delete;
+	Shader& operator=(const Shader&) = delete;
+
+	Shader(Shader&& other) noexcept;
+	Shader& operator=(Shader&& other) noexcept;
+
 	void setVec3(const std::string& name, const Vec3& vec) const;
 	void setMat4(const std::string& name, const Mat4& mat) const;
 
@@ -21,5 +26,3 @@ public:
 private:
 	GLuint program{};
 };
-
-#endif
