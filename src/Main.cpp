@@ -42,20 +42,24 @@ int main() {
 	{
 		Window window(1280, 720);
 
-		//Shader shader1("assets/shaders/shader.vert", "assets/shaders/shader.frag");
-
 		Camera cam;
 		cam.setViewportResolution((float)1280, (float)720);
-		cam.setPosition({0.0f, 1.0f, 3.0f});
+		cam.setPosition({-1.0f, 1.0f, 3.0f});
 
 		Model model1("assets/models/pyramid/obj");
-		model1.addNormalInstance();
+		model1.addInstance({Mat4::translate({0.0f, 1.0f, 0.0f}), {0.7f, 0.0f, 0.5f}});
 		model1.uploadInstances();
 
-		//window.addShader(std::move(shader1), "shader1");
+		Model model2("assets/models/citlali/obj");
+		model2.addInstance({Mat4::translate({-2.0f, 0.0f, 0.0f}), {0.0f, 1.0f, 1.0f}});
+		model2.uploadInstances();
+
 		window.addShader("shader1", "assets/shaders/shader.vert", "assets/shaders/shader.frag");
+
 		window.addCamera(std::move(cam), "cam1");
+
 		window.addModel(std::move(model1), "shader1", "cam1", "model1");
+		window.addModel(std::move(model2), "shader1", "cam1", "model2");
 
 		//window.setFramebufferSizeCallback(resize);
 		//window.setKeyCallback(keyCallback);
