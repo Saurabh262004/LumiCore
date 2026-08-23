@@ -22,14 +22,14 @@ Model::Model(const std::string& path) {
 void Model::processNode(aiNode* node, const aiScene* scene) {
 	for (unsigned i = 0; i < node->mNumMeshes; ++i) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(mesh, scene));
+		meshes.push_back(processMesh(mesh));
 	}
 	for (unsigned i = 0; i < node->mNumChildren; ++i) {
 		processNode(node->mChildren[i], scene);
 	}
 }
 
-Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
+Mesh Model::processMesh(aiMesh* mesh) {
 	std::vector<Vertex> vertices;
 	vertices.reserve(mesh->mNumVertices);
 

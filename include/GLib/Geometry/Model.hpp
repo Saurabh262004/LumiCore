@@ -53,5 +53,5 @@ private:
 	std::vector<Mesh> meshes;
 
 	void processNode(aiNode* node, const aiScene* scene);
-	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
+	Mesh processMesh(aiMesh* mesh);
 };

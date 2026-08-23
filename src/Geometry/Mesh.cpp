@@ -100,19 +100,18 @@ Mesh::~Mesh() {
 	glDeleteBuffers(1, &instanceVBO);
 }
 
-Mesh::Mesh(Mesh&& other) noexcept
-	: VAO{other.VAO}, VBO{other.VBO}, EBO{other.EBO}, instanceVBO{other.instanceVBO},
-	  vertexCount{other.vertexCount}, indexCount{other.indexCount}, instanceCount{other.instanceCount},
-	  instanceBaseLocation{other.instanceBaseLocation}
+Mesh::Mesh(Mesh&& other) noexcept :
+	VAO{other.VAO}, VBO{other.VBO}, EBO{other.EBO}, instanceVBO{other.instanceVBO},
+	instanceBaseLocation{other.instanceBaseLocation}, vertexCount{other.vertexCount}, indexCount{other.indexCount}, instanceCount{other.instanceCount}
 {
 	other.VAO = 0;
 	other.VBO = 0;
 	other.EBO = 0;
 	other.instanceVBO = 0;
+	other.instanceBaseLocation = 1;
 	other.vertexCount = 0;
 	other.indexCount = 0;
 	other.instanceCount = 0;
-	other.instanceBaseLocation = 1;
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept {
@@ -126,19 +125,19 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 		VBO = other.VBO;
 		EBO = other.EBO;
 		instanceVBO = other.instanceVBO;
+		instanceBaseLocation = other.instanceBaseLocation;
 		vertexCount = other.vertexCount;
 		indexCount = other.indexCount;
 		instanceCount = other.instanceCount;
-		instanceBaseLocation = other.instanceBaseLocation;
 
 		other.VAO = 0;
 		other.VBO = 0;
 		other.EBO = 0;
 		other.instanceVBO = 0;
+		other.instanceBaseLocation = 1;
 		other.vertexCount = 0;
 		other.indexCount = 0;
 		other.instanceCount = 0;
-		other.instanceBaseLocation = 1;
 	}
 	return *this;
 }
