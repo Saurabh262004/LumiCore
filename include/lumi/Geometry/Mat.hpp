@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GLib/Geometry/Vec.hpp>
+#include <lumi/Geometry/Vec.hpp>
 #include <cmath>
 
 struct Mat4 {

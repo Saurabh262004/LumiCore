@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include <GLib/Shader.hpp>
-#include <GLib/Window.hpp>
+#include <lumi/Shader.hpp>
+#include <lumi/Window.hpp>
 
 void Window::loop() {
 	bool errorsInLoop = false;

@@ -1,8 +1,8 @@
 #include <iostream>
 #include <utility>
 
-#include <GLib/Shader.hpp>
-#include <GLib/Util.hpp>
+#include <lumi/Shader.hpp>
+#include <lumi/Util.hpp>
 
 Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath) {
 	std::string vertexCode = Util::readFile(vertexPath);

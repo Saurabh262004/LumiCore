@@ -2,7 +2,7 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <GLib/Geometry/Mesh.hpp>
+#include <lumi/Geometry/Mesh.hpp>
 
 struct aiNode;
 struct aiScene;

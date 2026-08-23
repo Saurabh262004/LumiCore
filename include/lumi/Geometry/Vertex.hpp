@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <vector>
 
-#include <GLib/Geometry/Vec.hpp>
+#include <lumi/Geometry/Vec.hpp>
 
 struct VertexAttribute {
 	GLuint location;

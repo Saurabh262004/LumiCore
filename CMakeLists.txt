@@ -17,22 +17,22 @@ file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
 	"external/glad/glad.c"
 )
 
-add_library(GLib STATIC ${LIB_SOURCES})
+add_library(lumi STATIC ${LIB_SOURCES})
 
-target_include_directories(GLib
+target_include_directories(lumi
 	PUBLIC
 		include
 		external
 )
 
-target_link_libraries(GLib
+target_link_libraries(lumi
 	PUBLIC
 		glfw
 		OpenGL::GL
 		assimp
 )
 
-target_compile_options(GLib PRIVATE
+target_compile_options(lumi PRIVATE
 	$<$<CXX_COMPILER_ID:GNU,Clang>:-Wall -Wextra>
 )
 
@@ -44,5 +44,5 @@ add_executable(app
 
 target_link_libraries(app
 	PRIVATE
-		GLib
+		lumi
 )

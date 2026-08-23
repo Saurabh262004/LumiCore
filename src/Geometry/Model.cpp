@@ -5,8 +5,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-#include <GLib/Geometry/Model.hpp>
-#include <GLib/Geometry/Vertex.hpp>
+#include <lumi/Geometry/Model.hpp>
+#include <lumi/Geometry/Vertex.hpp>
 
 Model::Model(const std::string& path) {
 	Assimp::Importer importer;

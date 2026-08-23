@@ -6,9 +6,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <GLib/Geometry/Vec.hpp>
-#include <GLib/Geometry/Mat.hpp>
-#include <GLib/Geometry/Vertex.hpp>
+#include <lumi/Geometry/Vec.hpp>
+#include <lumi/Geometry/Mat.hpp>
+#include <lumi/Geometry/Vertex.hpp>
 
 struct InstanceData {
 	Mat4 model; // position + rotation + scale

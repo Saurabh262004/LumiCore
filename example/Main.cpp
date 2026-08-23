@@ -1,9 +1,9 @@
 #include <iostream>
 
-#include <GLib/Shader.hpp>
-#include <GLib/Camera.hpp>
-#include <GLib/Geometry/Model.hpp>
-#include <GLib/Window.hpp>
+#include <lumi/Shader.hpp>
+#include <lumi/Camera.hpp>
+#include <lumi/Geometry/Model.hpp>
+#include <lumi/Window.hpp>
 
 //void resize(GLFWwindow* window, int width, int height) {
 //	glViewport(0, 0, width, height);

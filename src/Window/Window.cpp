@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <GLib/Window.hpp>
+#include <lumi/Window.hpp>
 
 Window::Window(int width, int height, bool fullscreen) : width{width}, height{height}, fullscreen{fullscreen} {
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
