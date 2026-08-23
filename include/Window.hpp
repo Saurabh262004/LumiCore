@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <deque>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -13,11 +14,25 @@
 struct MeshEntry {
 	std::string id;
 	Mesh mesh;
+
+	MeshEntry(std::string id, Mesh mesh) : id(std::move(id)), mesh(std::move(mesh)) {}
+
+	MeshEntry(const MeshEntry&) = delete;
+	MeshEntry& operator=(const MeshEntry&) = delete;
+	MeshEntry(MeshEntry&&) noexcept = default;
+	MeshEntry& operator=(MeshEntry&&) noexcept = default;
 };
 
 struct ModelEntry {
 	std::string id;
 	Model model;
+
+	ModelEntry(std::string id, Model model) : id(std::move(id)), model(std::move(model)) {}
+
+	ModelEntry(const ModelEntry&) = delete;
+	ModelEntry& operator=(const ModelEntry&) = delete;
+	ModelEntry(ModelEntry&&) noexcept = default;
+	ModelEntry& operator=(ModelEntry&&) noexcept = default;
 };
 
 class Window {
@@ -31,59 +46,20 @@ public:
 	int getHeight() { return height; }
 	bool getFullscreen() { return fullscreen; }
 
-	bool hasCamera(const std::string& id) const {
-		return cameras.find(id) != cameras.end();
-	}
+	Shader* getShader(const std::string id);
+	Camera* getCamera(const std::string id);
 
-	bool hasShader(const std::string& id) const {
-		return shaders.find(id) != shaders.end();
-	}
+	Mesh* getMesh(const std::string shaderID, const std::string camID, const std::string meshID);
+	Model* getModel(const std::string shaderID, const std::string camID, const std::string modelID);
 
-	void addCamera(Camera camera, std::string id) {
-		cameras.insert_or_assign(std::move(id), std::move(camera));
-	}
+	bool hasCamera(const std::string& id) const;
+	bool hasShader(const std::string& id) const;
 
-	void addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath) {
-		shaders.try_emplace(
-			std::move(id),
-			vertexPath,
-			fragmentPath
-		);
-	}
+	void addCamera(std::string id);
+	void addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath);
 
-	void addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID) {
-		if (!hasShader(shaderID)) {
-			throw std::runtime_error("addMesh: no shader registered with id \"" + shaderID + "\"");
-		}
-
-		if (!hasCamera(camID)) {
-			throw std::runtime_error("addMesh: no camera registered with id \"" + camID + "\"");
-		}
-
-		MeshEntry meshE = {
-			std::move(meshID),
-			std::move(mesh),
-		};
-
-		meshes[shaderID][camID].push_back(std::move(meshE));
-	}
-
-	void addModel(Model model, std::string shaderID, std::string camID, std::string modelID) {
-		if (!hasShader(shaderID)) {
-			throw std::runtime_error("addModel: no shader registered with id \"" + shaderID + "\"");
-		}
-
-		if (!hasCamera(camID)) {
-			throw std::runtime_error("addModel: no camera registered with id \"" + camID + "\"");
-		}
-
-		ModelEntry modelE = {
-			std::move(modelID),
-			std::move(model),
-		};
-
-		models[shaderID][camID].push_back(std::move(modelE));
-	}
+	void addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID);
+	void addModel(std::string shaderID, std::string camID, std::string modelID, std::string path);
 
 	// Window events
 	void setWindowPosCallback(GLFWwindowposfun callback);					// Window moved
@@ -121,9 +97,9 @@ private:
 	std::unordered_map<std::string, Camera> cameras;
 	std::unordered_map<std::string, Shader> shaders;
 
-	// map<shaderID, map<CamID, vector<{objectID, object}>>>
-	std::unordered_map<std::string, std::unordered_map<std::string, std::vector<MeshEntry>>> meshes;
-	std::unordered_map<std::string, std::unordered_map<std::string, std::vector<ModelEntry>>> models;
+	// map<shaderID, map<CamID, deque<{objectID, object}>>>
+	std::unordered_map<std::string, std::unordered_map<std::string, std::deque<MeshEntry>>> meshes;
+	std::unordered_map<std::string, std::unordered_map<std::string, std::deque<ModelEntry>>> models;
 
 	bool initOpenGL(int width, int height);
 	bool checkError(const char* where);

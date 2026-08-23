@@ -80,6 +80,80 @@ bool Window::checkError(const char* where) {
 	return false;
 }
 
+Shader* Window::getShader(const std::string id) {
+	return &shaders.at(id);
+}
+
+Camera* Window::getCamera(const std::string id) {
+	return &cameras.at(id);
+}
+
+Mesh* Window::getMesh(const std::string shaderID, const std::string camID, const std::string meshID) {
+	for (auto& meshEntry : meshes.at(shaderID).at(camID)) {
+		if (meshEntry.id == meshID) return &meshEntry.mesh;
+	}
+
+	throw std::runtime_error("getMesh: no mesh registered with id: \"" + meshID + "\" under shaderID: \"" + shaderID + "\" and camID: \"" + camID + "\"");
+}
+
+Model* Window::getModel(const std::string shaderID, const std::string camID, const std::string modelID) {
+	for (auto& modelEntry : models.at(shaderID).at(camID)) {
+		if (modelEntry.id == modelID) return &modelEntry.model;
+	}
+
+	throw std::runtime_error("getMesh: no model registered with id: \"" + modelID + "\" under shaderID: \"" + shaderID + "\" and camID: \"" + camID + "\"");
+}
+
+bool Window::hasCamera(const std::string& id) const {
+	return cameras.find(id) != cameras.end();
+}
+
+bool Window::hasShader(const std::string& id) const {
+	return shaders.find(id) != shaders.end();
+}
+
+void Window::addCamera(std::string id) {
+	cameras.insert_or_assign(std::move(id), Camera());
+}
+
+void Window::addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath) {
+	shaders.try_emplace(
+		std::move(id),
+		vertexPath,
+		fragmentPath
+	);
+}
+
+void Window::addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID) {
+	if (!hasShader(shaderID)) {
+		throw std::runtime_error("addMesh: no shader registered with id \"" + shaderID + "\"");
+	}
+
+	if (!hasCamera(camID)) {
+		throw std::runtime_error("addMesh: no camera registered with id \"" + camID + "\"");
+	}
+
+	meshes[shaderID][camID].emplace_back(
+		std::move(meshID),
+		std::move(mesh)
+	);
+}
+
+void Window::addModel(std::string shaderID, std::string camID, std::string modelID, std::string path) {
+	if (!hasShader(shaderID)) {
+		throw std::runtime_error("addModel: no shader registered with id \"" + shaderID + "\"");
+	}
+
+	if (!hasCamera(camID)) {
+		throw std::runtime_error("addModel: no camera registered with id \"" + camID + "\"");
+	}
+
+	models[shaderID][camID].emplace_back(
+		std::move(modelID),
+		Model(path)
+	);
+}
+
 Window::~Window() {
 	std::cout << "Destroying window\n";
 	if (window) glfwDestroyWindow(window);

@@ -3,8 +3,6 @@
 #include <Window.hpp>
 
 void Window::loop() {
-	//Shader shader("assets/shaders/shader.vert", "assets/shaders/shader.frag");
-
 	bool errorsInLoop = false;
 
 	while (!glfwWindowShouldClose(window) && !errorsInLoop) {
@@ -12,18 +10,15 @@ void Window::loop() {
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		//shader.use();
-
 		for (auto& [camID, camera] : cameras) camera.updateViewProjection();
-
-		if (checkError("camera update")) errorsInLoop = true;
 
 		for (auto& [shaderID, camMap] : meshes) {
 			shaders.at(shaderID).use();
 
 			if (checkError("mesh, shader use")) errorsInLoop = true;
 
-			shaders.at(shaderID).setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f}); // temporary testing thing
+			shaders.at(shaderID).uploadUniforms();
+			//shaders.at(shaderID).setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f}); // temporary testing thing
 
 			if (checkError("mesh, shader set vec3")) errorsInLoop = true;
 
@@ -43,7 +38,8 @@ void Window::loop() {
 
 			if (checkError("model, shader use")) errorsInLoop = true;
 
-			shaders.at(shaderID).setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f}); // temporary testing thing
+			shaders.at(shaderID).uploadUniforms();
+			//shaders.at(shaderID).setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f}); // temporary testing thing
 
 			if (checkError("model, shader set vec3")) errorsInLoop = true;
 

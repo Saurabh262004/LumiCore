@@ -37,14 +37,36 @@ Shader::~Shader() {
 	glDeleteProgram(program);
 }
 
+void Shader::addVec2Uniform(std::string id, Vec2 vec) {	vec2Uniforms[id] = vec; }
+void Shader::addVec3Uniform(std::string id, Vec3 vec) {	vec3Uniforms[id] = vec; }
+void Shader::addVec4Uniform(std::string id, Vec4 vec) {	vec4Uniforms[id] = vec; }
+void Shader::addMat4Uniform(std::string id, Mat4 mat) {	mat4Uniforms[id] = mat; }
+
+void Shader::setVec2(const std::string& name, const Vec2& vec) const {
+	GLint location = glGetUniformLocation(program, name.c_str());
+	glUniform2f(location, vec.x, vec.y);
+}
+
 void Shader::setVec3(const std::string& name, const Vec3& vec) const {
 	GLint location = glGetUniformLocation(program, name.c_str());
 	glUniform3f(location, vec.x, vec.y, vec.z);
 }
 
+void Shader::setVec4(const std::string& name, const Vec4& vec) const {
+	GLint location = glGetUniformLocation(program, name.c_str());
+	glUniform4f(location, vec.x, vec.y, vec.z, vec.w);
+}
+
 void Shader::setMat4(const std::string& name, const Mat4& mat) const {
 	GLint location = glGetUniformLocation(program, name.c_str());
 	glUniformMatrix4fv(location, 1, GL_FALSE, mat.data());
+}
+
+void Shader::uploadUniforms() {
+	for (auto& [id, vec2] : vec2Uniforms) setVec2(id, vec2);
+	for (auto& [id, vec3] : vec3Uniforms) setVec3(id, vec3);
+	for (auto& [id, vec4] : vec4Uniforms) setVec4(id, vec4);
+	for (auto& [id, mat4] : mat4Uniforms) setMat4(id, mat4);
 }
 
 void Shader::use() const {
