@@ -45,5 +45,5 @@ private:
 	std::size_t vertexCount{0};
 	std::size_t indexCount{0};
 	std::size_t instanceCount{0};
-	std::vector<InstanceData> instanceBuffer;
+	std::vector<InstanceData> instanceBuffer{};
 };

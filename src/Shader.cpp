@@ -73,13 +73,23 @@ void Shader::use() const {
 	glUseProgram(program);
 }
 
-Shader::Shader(Shader&& other) noexcept : program{std::exchange(other.program, 0)} {}
+Shader::Shader(Shader&& other) noexcept :
+	program{std::exchange(other.program, 0)},
+	vec2Uniforms{std::move(other.vec2Uniforms)},
+	vec3Uniforms{std::move(other.vec3Uniforms)},
+	vec4Uniforms{std::move(other.vec4Uniforms)},
+	mat4Uniforms{std::move(other.mat4Uniforms)}
+{}
 
 Shader& Shader::operator=(Shader&& other) noexcept {
 	if (this != &other) {
 		if (program != 0) glDeleteProgram(program);
 
 		program = std::exchange(other.program, 0);
+		vec2Uniforms = std::move(other.vec2Uniforms);
+		vec3Uniforms = std::move(other.vec3Uniforms);
+		vec4Uniforms = std::move(other.vec4Uniforms);
+		mat4Uniforms = std::move(other.mat4Uniforms);
 	}
 
 	return *this;

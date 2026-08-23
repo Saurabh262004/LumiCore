@@ -29,6 +29,7 @@ struct Vertex {
 			{
 				{ 0, 3, offsetof(Vertex, position) },
 				{ 1, 3, offsetof(Vertex, normal)   },
+				{ 2, 2, offsetof(Vertex, texCoord) },
 			}
 		};
 	}

@@ -101,8 +101,8 @@ Mesh::~Mesh() {
 }
 
 Mesh::Mesh(Mesh&& other) noexcept :
-	VAO{other.VAO}, VBO{other.VBO}, EBO{other.EBO}, instanceVBO{other.instanceVBO},
-	instanceBaseLocation{other.instanceBaseLocation}, vertexCount{other.vertexCount}, indexCount{other.indexCount}, instanceCount{other.instanceCount}
+	VAO{other.VAO}, VBO{other.VBO}, EBO{other.EBO}, instanceVBO{other.instanceVBO}, instanceBaseLocation{other.instanceBaseLocation},
+	vertexCount{other.vertexCount}, indexCount{other.indexCount}, instanceCount{other.instanceCount}, instanceBuffer{other.instanceBuffer}
 {
 	other.VAO = 0;
 	other.VBO = 0;
@@ -112,6 +112,7 @@ Mesh::Mesh(Mesh&& other) noexcept :
 	other.vertexCount = 0;
 	other.indexCount = 0;
 	other.instanceCount = 0;
+	other.instanceBuffer = {};
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept {
@@ -129,6 +130,7 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 		vertexCount = other.vertexCount;
 		indexCount = other.indexCount;
 		instanceCount = other.instanceCount;
+		instanceBuffer = std::move(other.instanceBuffer);
 
 		other.VAO = 0;
 		other.VBO = 0;
@@ -138,6 +140,7 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 		other.vertexCount = 0;
 		other.indexCount = 0;
 		other.instanceCount = 0;
+		other.instanceBuffer = {};
 	}
 	return *this;
 }
