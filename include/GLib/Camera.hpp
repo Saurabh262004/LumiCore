@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Geometry/Vec.hpp>
-#include <Geometry/Mat.hpp>
+#include <GLib/Geometry/Vec.hpp>
+#include <GLib/Geometry/Mat.hpp>
 
 class Camera {
 private:

@@ -5,9 +5,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <Geometry/Vec.hpp>
-#include <Geometry/Mat.hpp>
-#include <Geometry/Mat.hpp>
+#include <GLib/Geometry/Vec.hpp>
+#include <GLib/Geometry/Mat.hpp>
+#include <GLib/Geometry/Mat.hpp>
 
 class Shader {
 public:

@@ -1,6 +1,7 @@
 #include <iostream>
-#include <Shader.hpp>
-#include <Window.hpp>
+
+#include <GLib/Shader.hpp>
+#include <GLib/Window.hpp>
 
 void Window::loop() {
 	bool errorsInLoop = false;

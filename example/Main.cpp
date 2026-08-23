@@ -1,11 +1,9 @@
 #include <iostream>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
-#include <Shader.hpp>
-#include <Camera.hpp>
-#include <Geometry/Model.hpp>
-#include <Window.hpp>
+#include <GLib/Shader.hpp>
+#include <GLib/Camera.hpp>
+#include <GLib/Geometry/Model.hpp>
+#include <GLib/Window.hpp>
 
 //void resize(GLFWwindow* window, int width, int height) {
 //	glViewport(0, 0, width, height);

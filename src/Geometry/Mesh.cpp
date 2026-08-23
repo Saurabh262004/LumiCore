@@ -2,9 +2,9 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <Geometry/Vec.hpp>
-#include <Geometry/Vertex.hpp>
-#include <Geometry/Mesh.hpp>
+#include <GLib/Geometry/Vec.hpp>
+#include <GLib/Geometry/Vertex.hpp>
+#include <GLib/Geometry/Mesh.hpp>
 
 Mesh::Mesh(const void* vertexData, std::size_t vertexCount, const VertexLayout& layout) : Mesh(vertexData, vertexCount, nullptr, 0, layout) {}
 

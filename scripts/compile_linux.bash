@@ -5,7 +5,7 @@ set -e
 RUN="${1:-no}"
 NVIDIA="${2:-no}"
 
-BUILD_DIR="build/linux"
+BUILD_DIR="example/build/linux"
 
 cmake -B "$BUILD_DIR" -S . -DCMAKE_BUILD_TYPE=Release
 cmake --build "$BUILD_DIR"

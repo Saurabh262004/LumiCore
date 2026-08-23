@@ -6,10 +6,10 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <Shader.hpp>
-#include <Geometry/Mesh.hpp>
-#include <Geometry/Model.hpp>
-#include <Camera.hpp>
+#include <GLib/Shader.hpp>
+#include <GLib/Geometry/Mesh.hpp>
+#include <GLib/Geometry/Model.hpp>
+#include <GLib/Camera.hpp>
 
 struct MeshEntry {
 	std::string id;

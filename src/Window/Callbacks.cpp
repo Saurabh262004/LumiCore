@@ -3,8 +3,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <Util.hpp>
-#include <Window.hpp>
+#include <GLib/Util.hpp>
+#include <GLib/Window.hpp>
 
 void Window::setInternalCallbacks() {
 	glfwSetWindowPosCallback(window, staticWindowPosCallback);

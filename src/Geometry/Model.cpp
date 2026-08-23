@@ -1,11 +1,12 @@
 #include <iostream>
+#include <stdexcept>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
-#include <Geometry/Model.hpp>
-#include <Geometry/Vertex.hpp>
-#include <stdexcept>
+
+#include <GLib/Geometry/Model.hpp>
+#include <GLib/Geometry/Vertex.hpp>
 
 Model::Model(const std::string& path) {
 	Assimp::Importer importer;

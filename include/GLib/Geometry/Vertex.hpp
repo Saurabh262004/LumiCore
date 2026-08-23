@@ -4,7 +4,8 @@
 #include <GLFW/glfw3.h>
 #include <cstddef>
 #include <vector>
-#include <Geometry/Vec.hpp>
+
+#include <GLib/Geometry/Vec.hpp>
 
 struct VertexAttribute {
 	GLuint location;
