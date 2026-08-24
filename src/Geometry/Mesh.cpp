@@ -81,7 +81,15 @@ void Mesh::updateInstanceData(const InstanceData* data, std::size_t count) {
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Mesh::draw() const {
+void Mesh::draw(const Shader& shader) const {
+	shader.setVec3("material.color", materialColor);
+	shader.setInt("material.hasTexture", texture.has_value() ? 1 : 0);
+
+	if (texture) {
+		texture->bind(0);
+		shader.setInt("material.diffuse", 0);
+	}
+
 	glBindVertexArray(VAO);
 
 	if (EBO != 0) {
@@ -101,8 +109,10 @@ Mesh::~Mesh() {
 }
 
 Mesh::Mesh(Mesh&& other) noexcept :
-	VAO{other.VAO}, VBO{other.VBO}, EBO{other.EBO}, instanceVBO{other.instanceVBO}, instanceBaseLocation{other.instanceBaseLocation},
-	vertexCount{other.vertexCount}, indexCount{other.indexCount}, instanceCount{other.instanceCount}, instanceBuffer{other.instanceBuffer}
+	VAO{other.VAO}, VBO{other.VBO}, EBO{other.EBO}, instanceVBO{other.instanceVBO},
+	instanceBaseLocation{other.instanceBaseLocation}, vertexCount{other.vertexCount}, indexCount{other.indexCount}, instanceCount{other.instanceCount},
+	instanceBuffer{std::move(other.instanceBuffer)},
+	materialColor{other.materialColor}, texture{std::move(other.texture)}
 {
 	other.VAO = 0;
 	other.VBO = 0;
@@ -112,7 +122,6 @@ Mesh::Mesh(Mesh&& other) noexcept :
 	other.vertexCount = 0;
 	other.indexCount = 0;
 	other.instanceCount = 0;
-	other.instanceBuffer = {};
 }
 
 Mesh& Mesh::operator=(Mesh&& other) noexcept {
@@ -131,6 +140,8 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 		indexCount = other.indexCount;
 		instanceCount = other.instanceCount;
 		instanceBuffer = std::move(other.instanceBuffer);
+		materialColor = other.materialColor;
+		texture = std::move(other.texture);
 
 		other.VAO = 0;
 		other.VBO = 0;
@@ -140,7 +151,6 @@ Mesh& Mesh::operator=(Mesh&& other) noexcept {
 		other.vertexCount = 0;
 		other.indexCount = 0;
 		other.instanceCount = 0;
-		other.instanceBuffer = {};
 	}
 	return *this;
 }

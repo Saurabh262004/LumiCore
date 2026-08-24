@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <vector>
 
 #include <glad/glad.h>
@@ -9,6 +10,8 @@
 #include <lumi/Geometry/Vec.hpp>
 #include <lumi/Geometry/Mat.hpp>
 #include <lumi/Geometry/Vertex.hpp>
+#include <lumi/Shader.hpp>
+#include <lumi/Texture.hpp>
 
 struct InstanceData {
 	Mat4 model; // position + rotation + scale
@@ -29,7 +32,11 @@ public:
 
 	void setInstanceData(const InstanceData* data, std::size_t count, GLenum usage = GL_STATIC_DRAW);
 	void updateInstanceData(const InstanceData* data, std::size_t count);
-	void draw() const;
+
+	void setMaterialColor(const Vec3& color) { materialColor = color; }
+	void setTexture(Texture&& tex) { texture = std::move(tex); }
+
+	void draw(const Shader& shader) const;
 
 	Mesh(const Mesh&) = delete;
 	Mesh& operator=(const Mesh&) = delete;
@@ -45,5 +52,8 @@ private:
 	std::size_t vertexCount{0};
 	std::size_t indexCount{0};
 	std::size_t instanceCount{0};
-	std::vector<InstanceData> instanceBuffer{};
+	std::vector<InstanceData> instanceBuffer;
+
+	Vec3 materialColor{1.0f, 1.0f, 1.0f};
+	std::optional<Texture> texture;
 };

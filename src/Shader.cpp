@@ -41,6 +41,7 @@ void Shader::addVec2Uniform(std::string id, Vec2 vec) {	vec2Uniforms[id] = vec; 
 void Shader::addVec3Uniform(std::string id, Vec3 vec) {	vec3Uniforms[id] = vec; }
 void Shader::addVec4Uniform(std::string id, Vec4 vec) {	vec4Uniforms[id] = vec; }
 void Shader::addMat4Uniform(std::string id, Mat4 mat) {	mat4Uniforms[id] = mat; }
+void Shader::addIntUniform(std::string id, int value) {	intUniforms[id] = value; }
 
 void Shader::setVec2(const std::string& name, const Vec2& vec) const {
 	GLint location = glGetUniformLocation(program, name.c_str());
@@ -62,11 +63,17 @@ void Shader::setMat4(const std::string& name, const Mat4& mat) const {
 	glUniformMatrix4fv(location, 1, GL_FALSE, mat.data());
 }
 
+void Shader::setInt(const std::string& name, int value) const {
+	GLint location = glGetUniformLocation(program, name.c_str());
+	glUniform1i(location, value);
+}
+
 void Shader::uploadUniforms() {
 	for (auto& [id, vec2] : vec2Uniforms) setVec2(id, vec2);
 	for (auto& [id, vec3] : vec3Uniforms) setVec3(id, vec3);
 	for (auto& [id, vec4] : vec4Uniforms) setVec4(id, vec4);
 	for (auto& [id, mat4] : mat4Uniforms) setMat4(id, mat4);
+	for (auto& [id, value] : intUniforms) setInt(id, value);
 }
 
 void Shader::use() const {
@@ -78,7 +85,8 @@ Shader::Shader(Shader&& other) noexcept :
 	vec2Uniforms{std::move(other.vec2Uniforms)},
 	vec3Uniforms{std::move(other.vec3Uniforms)},
 	vec4Uniforms{std::move(other.vec4Uniforms)},
-	mat4Uniforms{std::move(other.mat4Uniforms)}
+	mat4Uniforms{std::move(other.mat4Uniforms)},
+	intUniforms{std::move(other.intUniforms)}
 {}
 
 Shader& Shader::operator=(Shader&& other) noexcept {
@@ -90,6 +98,7 @@ Shader& Shader::operator=(Shader&& other) noexcept {
 		vec3Uniforms = std::move(other.vec3Uniforms);
 		vec4Uniforms = std::move(other.vec4Uniforms);
 		mat4Uniforms = std::move(other.mat4Uniforms);
+		intUniforms = std::move(other.intUniforms);
 	}
 
 	return *this;

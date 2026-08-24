@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <lumi/Geometry/Mesh.hpp>
+#include <lumi/Shader.hpp>
 
 struct aiNode;
 struct aiScene;
@@ -10,7 +11,9 @@ struct aiMesh;
 
 class Model {
 public:
-	explicit Model(const std::string& path);
+	explicit Model(const std::string& path, bool normalizeToUnitCube = false);
+
+	float appliedScale() const { return importScale; }
 
 	void addInstance(const InstanceData& instance) {
 		for (auto& mesh : meshes) mesh.addInstance(instance);
@@ -36,8 +39,8 @@ public:
 		for (auto& mesh : meshes) mesh.setInstanceData(data, count, usage);
 	}
 
-	void draw() const {
-		for (const auto& mesh : meshes) mesh.draw();
+	void draw(const Shader& shader) const {
+		for (const auto& mesh : meshes) mesh.draw(shader);
 	}
 
 	void updateInstanceData(const InstanceData* data, std::size_t count) {
@@ -51,7 +54,9 @@ public:
 
 private:
 	std::vector<Mesh> meshes;
+	std::string directory;
+	float importScale{1.0f};
 
 	void processNode(aiNode* node, const aiScene* scene);
-	Mesh processMesh(aiMesh* mesh);
+	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 };

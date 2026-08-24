@@ -59,7 +59,7 @@ public:
 	void addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath);
 
 	void addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID);
-	void addModel(std::string shaderID, std::string camID, std::string modelID, std::string path);
+	void addModel(std::string shaderID, std::string camID, std::string modelID, std::string path, bool normalizeToUnitCube = false);
 
 	// Window events
 	void setWindowPosCallback(GLFWwindowposfun callback);					// Window moved

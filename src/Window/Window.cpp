@@ -139,7 +139,7 @@ void Window::addMesh(Mesh mesh, std::string shaderID, std::string camID, std::st
 	);
 }
 
-void Window::addModel(std::string shaderID, std::string camID, std::string modelID, std::string path) {
+void Window::addModel(std::string shaderID, std::string camID, std::string modelID, std::string path, bool normalizeToUnitCube) {
 	if (!hasShader(shaderID)) {
 		throw std::runtime_error("addModel: no shader registered with id \"" + shaderID + "\"");
 	}
@@ -150,7 +150,7 @@ void Window::addModel(std::string shaderID, std::string camID, std::string model
 
 	models[shaderID][camID].emplace_back(
 		std::move(modelID),
-		Model(path)
+		Model(path, normalizeToUnitCube)
 	);
 }
 

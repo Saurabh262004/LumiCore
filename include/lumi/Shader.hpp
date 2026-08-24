@@ -17,6 +17,7 @@ public:
 	void addVec3Uniform(std::string id, Vec3 vec);
 	void addVec4Uniform(std::string id, Vec4 vec);
 	void addMat4Uniform(std::string id, Mat4 mat);
+	void addIntUniform(std::string id, int value);
 
 	void uploadUniforms();
 
@@ -32,6 +33,7 @@ public:
 	void setVec3(const std::string& name, const Vec3& vec) const;
 	void setVec4(const std::string& name, const Vec4& vec) const;
 	void setMat4(const std::string& name, const Mat4& mat) const;
+	void setInt(const std::string& name, int value) const;
 
 	void use() const;
 
@@ -42,4 +44,5 @@ private:
 	std::unordered_map<std::string, Vec3> vec3Uniforms;
 	std::unordered_map<std::string, Vec4> vec4Uniforms;
 	std::unordered_map<std::string, Mat4> mat4Uniforms;
+	std::unordered_map<std::string, int> intUniforms;
 };

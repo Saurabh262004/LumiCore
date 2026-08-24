@@ -19,7 +19,7 @@ void Window::loop() {
 			if (checkError("mesh, shader use")) errorsInLoop = true;
 
 			shaders.at(shaderID).uploadUniforms();
-			//shaders.at(shaderID).setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f}); // temporary testing thing
+			//shaders.at(shaderID).setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f}); // temporary testing thin
 
 			if (checkError("mesh, shader set vec3")) errorsInLoop = true;
 
@@ -28,7 +28,7 @@ void Window::loop() {
 
 				if (checkError("mesh, shader set mat4")) errorsInLoop = true;
 
-				for (auto& meshEntry : meshEntries) meshEntry.mesh.draw();
+				for (auto& meshEntry : meshEntries) meshEntry.mesh.draw(shaders.at(shaderID));
 
 				if (checkError("mesh, draw")) errorsInLoop = true;
 			}
@@ -49,7 +49,7 @@ void Window::loop() {
 
 				if (checkError("model, shader set mat4")) errorsInLoop = true;
 
-				for (auto& modelEntry : modelEntries) modelEntry.model.draw();
+				for (auto& modelEntry : modelEntries) modelEntry.model.draw(shaders.at(shaderID));
 
 				if (checkError("model, draw")) errorsInLoop = true;
 			}

@@ -1,19 +1,45 @@
+#include <cmath>
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
+#include <assimp/material.h>
+#include <assimp/texture.h>
 
 #include <lumi/Geometry/Model.hpp>
 #include <lumi/Geometry/Vertex.hpp>
+#include <lumi/Texture.hpp>
 
-Model::Model(const std::string& path) {
+Model::Model(const std::string& path, bool normalizeToUnitCube) {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_PreTransformVertices);
+	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_PreTransformVertices);
 
 	if (!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
 		throw std::runtime_error("Assimp error: " + std::string(importer.GetErrorString()));
+	}
+
+	std::size_t slash = path.find_last_of("/\\");
+	directory = (slash == std::string::npos) ? "." : path.substr(0, slash);
+
+	if (normalizeToUnitCube) {
+		float maxDistSq = 0.0f;
+
+		for (unsigned m = 0; m < scene->mNumMeshes; ++m) {
+			const aiMesh* mesh = scene->mMeshes[m];
+
+			for (unsigned v = 0; v < mesh->mNumVertices; ++v) {
+				const aiVector3D& p = mesh->mVertices[v];
+				float distSq = p.x * p.x + p.y * p.y + p.z * p.z;
+
+				if (distSq > maxDistSq) maxDistSq = distSq;
+			}
+		}
+
+		float maxDist = std::sqrt(maxDistSq);
+		importScale = (maxDist > 1e-6f) ? (0.5f / maxDist) : 1.0f;
 	}
 
 	processNode(scene->mRootNode, scene);
@@ -22,20 +48,20 @@ Model::Model(const std::string& path) {
 void Model::processNode(aiNode* node, const aiScene* scene) {
 	for (unsigned i = 0; i < node->mNumMeshes; ++i) {
 		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-		meshes.push_back(processMesh(mesh));
+		meshes.push_back(processMesh(mesh, scene));
 	}
 	for (unsigned i = 0; i < node->mNumChildren; ++i) {
 		processNode(node->mChildren[i], scene);
 	}
 }
 
-Mesh Model::processMesh(aiMesh* mesh) {
+Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 	std::vector<Vertex> vertices;
 	vertices.reserve(mesh->mNumVertices);
 
 	for (unsigned i = 0; i < mesh->mNumVertices; ++i) {
 		Vertex v{};
-		v.position = { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z };
+		v.position = { mesh->mVertices[i].x * importScale, mesh->mVertices[i].y * importScale, mesh->mVertices[i].z * importScale };
 		if (mesh->HasNormals())
 			v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
 		v.texCoord = mesh->mTextureCoords[0]
@@ -52,5 +78,60 @@ Mesh Model::processMesh(aiMesh* mesh) {
 			indices.push_back(face.mIndices[j]);
 	}
 
-	return Mesh(vertices.data(), vertices.size(), indices.data(), indices.size(), Vertex::layout());
+	Mesh result(vertices.data(), vertices.size(), indices.data(), indices.size(), Vertex::layout());
+
+	if (scene->mMaterials && mesh->mMaterialIndex < scene->mNumMaterials) {
+		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+
+		aiColor4D diffuseColor{1.0f, 1.0f, 1.0f, 1.0f};
+		if (aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuseColor) == AI_SUCCESS) {
+			result.setMaterialColor({ diffuseColor.r, diffuseColor.g, diffuseColor.b });
+		}
+
+		if (material->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+			aiString texPath;
+			if (material->GetTexture(aiTextureType_DIFFUSE, 0, &texPath) == AI_SUCCESS) {
+				std::string pathStr = texPath.C_Str();
+
+				if (!pathStr.empty() && pathStr[0] == '*') {
+					int texIndex = std::atoi(pathStr.c_str() + 1);
+
+					if (texIndex >= 0 && static_cast<unsigned>(texIndex) < scene->mNumTextures) {
+						const aiTexture* embedded = scene->mTextures[texIndex];
+
+						try {
+							if (embedded->mHeight == 0) {
+								result.setTexture(Texture::fromMemory(
+									reinterpret_cast<const unsigned char*>(embedded->pcData),
+									embedded->mWidth
+								));
+							} else {
+								result.setTexture(Texture::fromRawBGRA(
+									reinterpret_cast<const unsigned char*>(embedded->pcData),
+									static_cast<int>(embedded->mWidth), static_cast<int>(embedded->mHeight)
+								));
+							}
+						} catch (const std::exception& e) {
+							std::cerr << "Model: " << e.what() << "\n";
+						}
+					} else {
+						std::cerr << "Model: embedded texture index out of range: " << pathStr << "\n";
+					}
+				} else {
+					// normalize paths
+					for (char& c : pathStr) {
+						if (c == '\\') c = '/';
+					}
+
+					try {
+						result.setTexture(Texture(directory + "/" + pathStr));
+					} catch (const std::exception& e) {
+						std::cerr << "Model: " << e.what() << "\n";
+					}
+				}
+			}
+		}
+	}
+
+	return result;
 }
