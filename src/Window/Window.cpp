@@ -191,6 +191,8 @@ void Window::addModel(std::string shaderID, std::string camID, std::string model
 	);
 }
 
+void Window::close() { active = false; }
+
 Window::~Window() {
 	std::cout << "Destroying window\n";
 	if (window) glfwDestroyWindow(window);

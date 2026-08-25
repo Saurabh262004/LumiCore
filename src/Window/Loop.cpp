@@ -5,10 +5,11 @@
 
 void Window::loop() {
 	bool errorsInLoop = false;
-
+	
 	double lastTime = glfwGetTime();
 
-	while (!glfwWindowShouldClose(window) && !errorsInLoop) {
+	active = true;
+	while (active && !glfwWindowShouldClose(window) && !errorsInLoop) {
 		double currentTime = glfwGetTime();
 		float deltaTime = static_cast<float>(currentTime - lastTime);
 		lastTime = currentTime;

@@ -63,6 +63,8 @@ int main() {
 		window.setCameraController("cam1", std::make_unique<FreeFlyCameraController>(2.0f, 0.002));
 
 		Camera* cam = window.getCamera("cam1");
+		//cam->setUsePerspective(false);
+		//cam->setOrthoSize(2.0);
 		cam->setViewportResolution((float)1280, (float)720);
 		cam->setPosition({0.0f, 2.0f, 4.0f});
 

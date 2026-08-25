@@ -97,6 +97,8 @@ public:
 	// File events
 	void setDropCallback(GLFWdropfun callback);								// Files dropped onto window
 
+	void close();
+
 	void loop();
 
 private:
@@ -105,6 +107,7 @@ private:
 	int width{};
 	int height{};
 	bool fullscreen{};
+	bool active = false;
 
 	std::unordered_map<std::string, Camera> cameras;
 	std::unordered_map<std::string, Shader> shaders;

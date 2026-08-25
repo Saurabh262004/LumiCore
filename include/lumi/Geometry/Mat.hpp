@@ -132,6 +132,20 @@ struct Mat4 {
 		return result;
 	}
 
+	static Mat4 ortho(float left, float right, float bottom, float top, float near, float far) {
+		Mat4 result{};
+
+		result.m[0]  =  2.0f / (right - left);                  // col 0, row 0
+		result.m[5]  =  2.0f / (top - bottom);                  // col 1, row 1
+		result.m[10] = -2.0f / (far - near);                    // col 2, row 2
+		result.m[12] = -(right + left) / (right - left);        // col 3, row 0
+		result.m[13] = -(top + bottom) / (top - bottom);        // col 3, row 1
+		result.m[14] = -(far + near) / (far - near);            // col 3, row 2
+		result.m[15] =  1.0f;                                   // col 3, row 3
+
+		return result;
+	}
+
 	const float* data() const {
 		return &m[0];
 	}

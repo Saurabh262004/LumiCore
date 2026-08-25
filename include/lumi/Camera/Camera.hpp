@@ -11,13 +11,16 @@ private:
 
 	float fov = 45.0f * (M_PI / 180.0f);
 
-	float nearPlane = 0.1f;
-	float farPlane = 100.0f;
+	float nearPlane{0.001f};
+	float farPlane{1000.0f};
 
-	float viewportWidth = 800.0f;
-	float viewportHeight = 600.0f;
+	float viewportWidth{800.0f};
+	float viewportHeight{600.0f};
 
-	Mat4 viewProjection;
+	float orthoSize{10.0f};
+	bool perspective{true};
+
+	Mat4 viewProjection{};
 
 public:
 	void setPosition(Vec3 position) {
@@ -52,6 +55,14 @@ public:
 	void setViewportResolution(float width, float height) {
 		viewportWidth = width;
 		viewportHeight = height;
+	}
+
+	void setOrthoSize(float value) {
+		orthoSize = value;
+	}
+
+	void setUsePerspective(bool value) {
+		perspective = value;
 	}
 
 	Vec3 getPosition() const {
@@ -105,13 +116,29 @@ public:
 		return viewProjection;
 	}
 
+	float getOrthoSize() const {
+		return orthoSize;
+	}
+
+	bool getUsePerspective() const {
+		return perspective;
+	}
+
 	void updateViewProjection() {
 		Mat4 rotation = Mat4::rotateZ(-roll) * Mat4::rotateX(-pitch) * Mat4::rotateY(-yaw);
-		Mat4 translation  = Mat4::translate(-position);
+		Mat4 translation = Mat4::translate(-position);
 		Mat4 view = rotation * translation;
 
 		float aspect = viewportWidth / viewportHeight;
-		Mat4 projection = Mat4::perspective(fov, aspect, nearPlane, farPlane);
+
+		Mat4 projection;    
+		if (perspective) {
+			projection = Mat4::perspective(fov, aspect, nearPlane, farPlane);
+		} else {
+			float halfHeight = orthoSize * 0.5f;
+			float halfWidth = halfHeight * aspect;
+			projection = Mat4::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, nearPlane, farPlane);
+		}
 
 		viewProjection = projection * view;
 	}
