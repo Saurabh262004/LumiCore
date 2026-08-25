@@ -17,10 +17,9 @@ void FreeFlyCameraController::update(Window& window, Camera& camera, float delta
 		initialized = true;
 	}
 
-	bool isCursorCaptured = window.isCursorCaptured();
-	bool LeftAltHold = window.isKeyDown(Key::LeftAlt);
+	bool leftAltHold = window.isKeyDown(Key::LeftAlt);
 
-	if (isCursorCaptured) {
+	if (window.isCursorCaptured()) {
 		Vec2 mouseDelta = window.getMouseDelta();
 
 		camera.setYaw(camera.getYaw() - mouseDelta.x * mouseSensitivity);
@@ -41,8 +40,8 @@ void FreeFlyCameraController::update(Window& window, Camera& camera, float delta
 
 		camera.setPosition(pos);
 
-		if (LeftAltHold) window.setCursorCaptured(false);
-	} else if (!LeftAltHold) {
+		if (leftAltHold) window.setCursorCaptured(false);
+	} else if (!leftAltHold) {
 		window.setCursorCaptured(true);
 	}
 }
