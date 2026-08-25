@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <deque>
+#include <memory>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -9,7 +10,9 @@
 #include <lumi/Shader.hpp>
 #include <lumi/Geometry/Mesh.hpp>
 #include <lumi/Geometry/Model.hpp>
-#include <lumi/Camera.hpp>
+#include <lumi/Camera/Camera.hpp>
+#include <lumi/Camera/CameraController.hpp>
+#include <lumi/Key.hpp>
 
 struct MeshEntry {
 	std::string id;
@@ -58,6 +61,15 @@ public:
 	void addCamera(std::string id);
 	void addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath);
 
+	void setCameraController(const std::string& camID, std::unique_ptr<CameraController> controller);
+	void clearCameraController(const std::string& camID);
+	CameraController* getCameraController(const std::string& camID); // nullptr if no controller is set
+
+	bool isKeyDown(Key key) const;
+	Vec2 getMouseDelta() const;
+	void setCursorCaptured(bool captured);
+	bool isCursorCaptured() const;
+
 	void addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID);
 	void addModel(std::string shaderID, std::string camID, std::string modelID, std::string path, bool normalizeToUnitCube = false);
 
@@ -96,6 +108,11 @@ private:
 
 	std::unordered_map<std::string, Camera> cameras;
 	std::unordered_map<std::string, Shader> shaders;
+	std::unordered_map<std::string, std::unique_ptr<CameraController>> cameraControllers;
+
+	double mouseX{0.0}, mouseY{0.0};
+	Vec2 mouseDelta;
+	bool mouseInitialized{false};
 
 	// map<shaderID, map<CamID, deque<{objectID, object}>>>
 	std::unordered_map<std::string, std::unordered_map<std::string, std::deque<MeshEntry>>> meshes;

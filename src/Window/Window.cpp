@@ -116,6 +116,43 @@ void Window::addCamera(std::string id) {
 	cameras.insert_or_assign(std::move(id), Camera());
 }
 
+void Window::setCameraController(const std::string& camID, std::unique_ptr<CameraController> controller) {
+	if (!hasCamera(camID)) {
+		throw std::runtime_error("setCameraController: no camera registered with id \"" + camID + "\"");
+	}
+
+	if (controller) {
+		cameraControllers[camID] = std::move(controller);
+	} else {
+		cameraControllers.erase(camID);
+	}
+}
+
+void Window::clearCameraController(const std::string& camID) {
+	cameraControllers.erase(camID);
+}
+
+CameraController* Window::getCameraController(const std::string& camID) {
+	auto it = cameraControllers.find(camID);
+	return (it != cameraControllers.end()) ? it->second.get() : nullptr;
+}
+
+bool Window::isKeyDown(Key key) const {
+	return glfwGetKey(window, static_cast<int>(key)) == GLFW_PRESS;
+}
+
+Vec2 Window::getMouseDelta() const {
+	return mouseDelta;
+}
+
+void Window::setCursorCaptured(bool captured) {
+	glfwSetInputMode(window, GLFW_CURSOR, captured ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+}
+
+bool Window::isCursorCaptured() const {
+	return glfwGetInputMode(window, GLFW_CURSOR) == GLFW_CURSOR_DISABLED;
+}
+
 void Window::addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath) {
 	shaders.try_emplace(
 		std::move(id),

@@ -6,12 +6,36 @@
 void Window::loop() {
 	bool errorsInLoop = false;
 
+	double lastTime = glfwGetTime();
+
 	while (!glfwWindowShouldClose(window) && !errorsInLoop) {
+		double currentTime = glfwGetTime();
+		float deltaTime = static_cast<float>(currentTime - lastTime);
+		lastTime = currentTime;
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		for (auto& [camID, camera] : cameras) camera.updateViewProjection();
+		double currentMouseX, currentMouseY;
+		glfwGetCursorPos(window, &currentMouseX, &currentMouseY);
+
+		if (!mouseInitialized) {
+			mouseX = currentMouseX;
+			mouseY = currentMouseY;
+			mouseInitialized = true;
+		}
+
+		mouseDelta = Vec2{static_cast<float>(currentMouseX - mouseX), static_cast<float>(currentMouseY - mouseY)};
+		mouseX = currentMouseX;
+		mouseY = currentMouseY;
+
+		for (auto& [camID, camera] : cameras) {
+			if (CameraController* controller = getCameraController(camID)) {
+				controller->update(*this, camera, deltaTime);
+			}
+
+			camera.updateViewProjection();
+		}
 
 		for (auto& [shaderID, camMap] : meshes) {
 			shaders.at(shaderID).use();
@@ -19,7 +43,6 @@ void Window::loop() {
 			if (checkError("mesh, shader use")) errorsInLoop = true;
 
 			shaders.at(shaderID).uploadUniforms();
-			//shaders.at(shaderID).setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f}); // temporary testing thin
 
 			if (checkError("mesh, shader set vec3")) errorsInLoop = true;
 
@@ -40,7 +63,6 @@ void Window::loop() {
 			if (checkError("model, shader use")) errorsInLoop = true;
 
 			shaders.at(shaderID).uploadUniforms();
-			//shaders.at(shaderID).setVec3("lightDir", Vec3{-0.5f, -1.0f, -0.3f}); // temporary testing thing
 
 			if (checkError("model, shader set vec3")) errorsInLoop = true;
 

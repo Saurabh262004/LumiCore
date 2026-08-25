@@ -1,7 +1,8 @@
 #include <iostream>
 
 #include <lumi/Shader.hpp>
-#include <lumi/Camera.hpp>
+#include <lumi/Camera/Camera.hpp>
+#include <lumi/Camera/FreeFlyCameraController.hpp>
 #include <lumi/Geometry/Model.hpp>
 #include <lumi/Window.hpp>
 
@@ -59,6 +60,8 @@ int main() {
 		Window window(1280, 720);
 
 		window.addCamera("cam1");
+		window.setCameraController("cam1", std::make_unique<FreeFlyCameraController>(2.0f, 0.002));
+
 		Camera* cam = window.getCamera("cam1");
 		cam->setViewportResolution((float)1280, (float)720);
 		cam->setPosition({0.0f, 2.0f, 4.0f});
@@ -74,7 +77,7 @@ int main() {
 
 		window.addModel("shader1", "cam1", "model2", "assets/models/citlali/mmd/茜特拉莉_夏日.pmx", true);
 		Model* model2 = window.getModel("shader1", "cam1", "model2");
-		model2->addInstance({Mat4::translate({-2.0f, 0.0f, 0.0f}) * Mat4::scale({3.0f, 3.0f, 3.0f}), {1.0f, 1.0f, 1.0f}});
+		model2->addInstance({Mat4::translate({-2.0f, 0.0f, 0.0f}) * Mat4::scale({5.0f, 5.0f, 5.0f}), {1.0f, 1.0f, 1.0f}});
 		model2->uploadInstances();
 
 		window.addModel("shader1", "cam1", "model3", "assets/models/skull/fbx.fbx", true);

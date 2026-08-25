@@ -20,13 +20,13 @@ private:
 	Mat4 viewProjection;
 
 public:
-	// setters
 	void setPosition(Vec3 position) {
 		this->position = position;
 	}
 
 	void setPitch(float pitch) {
-		this->pitch = pitch;
+		constexpr float limit = 89.0f * static_cast<float>(M_PI) / 180.0f;
+		this->pitch = (pitch > limit) ? limit : (pitch < -limit ? -limit : pitch);
 	}
 
 	void setYaw(float yaw) {
@@ -54,7 +54,6 @@ public:
 		viewportHeight = height;
 	}
 
-	// getters
 	Vec3 getPosition() const {
 		return position;
 	}
@@ -69,6 +68,25 @@ public:
 
 	float getRoll() const {
 		return roll;
+	}
+
+	Mat4 getOrientation() const {
+		return Mat4::rotateY(yaw) * Mat4::rotateX(pitch) * Mat4::rotateZ(roll);
+	}
+
+	Vec3 getForward() const {
+		Vec4 f = getOrientation() * Vec4{0.0f, 0.0f, -1.0f, 0.0f};
+		return Vec3{f.x, f.y, f.z};
+	}
+
+	Vec3 getRight() const {
+		Vec4 r = getOrientation() * Vec4{1.0f, 0.0f, 0.0f, 0.0f};
+		return Vec3{r.x, r.y, r.z};
+	}
+
+	Vec3 getUp() const {
+		Vec4 u = getOrientation() * Vec4{0.0f, 1.0f, 0.0f, 0.0f};
+		return Vec3{u.x, u.y, u.z};
 	}
 
 	float getFOV() const {
@@ -88,7 +106,7 @@ public:
 	}
 
 	void updateViewProjection() {
-		Mat4 rotation = Mat4::rotateZ(-roll) * Mat4::rotateY(-yaw) * Mat4::rotateX(-pitch);
+		Mat4 rotation = Mat4::rotateZ(-roll) * Mat4::rotateX(-pitch) * Mat4::rotateY(-yaw);
 		Mat4 translation  = Mat4::translate(-position);
 		Mat4 view = rotation * translation;
 
