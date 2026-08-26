@@ -14,6 +14,30 @@
 #include <lumi/Camera/CameraController.hpp>
 #include <lumi/Key.hpp>
 
+// Window events
+using LumiWindowposfun          = void(*)(Window* window, int x, int y);                                // Window moved
+using LumiWindowsizefun         = void(*)(Window* window, int width, int height);                       // Window resized
+using LumiWindowclosefun        = void(*)(Window* window);                                              // Window close requested
+using LumiWindowrefreshfun      = void(*)(Window* window);                                              // Window needs redraw
+using LumiWindowfocusfun        = void(*)(Window* window, int focused);                                 // Window gained/lost focus
+using LumiWindowiconifyfun      = void(*)(Window* window, int iconified);                               // Window minimized/restored
+using LumiWindowmaximizefun     = void(*)(Window* window, int maximized);                               // Window maximized/restored
+using LumiFramebuffersizefun    = void(*)(Window* window, int width, int height);                       // Framebuffer resized
+using LumiWindowcontentscalefun = void(*)(Window* window, float xscale, float yscale);                  // DPI/content scale changed
+
+// Keyboard events
+using LumiKeyfun                = void(*)(Window* window, int key, int scancode, int action, int mods); // Key pressed/released/repeated
+using LumiCharfun               = void(*)(Window* window, unsigned int codepoint);                      // Unicode character input
+
+// Mouse events
+using LumiCursorposfun          = void(*)(Window* window, double x, double y);                          // Mouse moved
+using LumiCursorenterfun        = void(*)(Window* window, int entered);                                 // Mouse entered/left window
+using LumiMousebuttonfun        = void(*)(Window* window, int button, int action, int mods);            // Mouse button pressed/released
+using LumiScrollfun             = void(*)(Window* window, double dX, double dY);                        // Mouse wheel scrolled
+
+// File events
+using LumiDropfun               = void(*)(Window* window, int pathCount, const char** paths);           // Files dropped onto window
+
 struct MeshEntry {
 	std::string id;
 	Mesh mesh;
@@ -73,29 +97,23 @@ public:
 	void addMesh(Mesh mesh, std::string shaderID, std::string camID, std::string meshID);
 	void addModel(std::string shaderID, std::string camID, std::string modelID, std::string path, bool normalizeToUnitCube = false);
 
-	// Window events
-	void setWindowPosCallback(GLFWwindowposfun callback);					// Window moved
-	void setWindowSizeCallback(GLFWwindowsizefun callback);					// Window resized
-	void setWindowCloseCallback(GLFWwindowclosefun callback);				// Window close requested
-	void setWindowRefreshCallback(GLFWwindowrefreshfun callback);			// Window needs redraw
-	void setWindowFocusCallback(GLFWwindowfocusfun callback);				// Window gained/lost focus
-	void setWindowIconifyCallback(GLFWwindowiconifyfun callback);			// Window minimized/restored
-	void setWindowMaximizeCallback(GLFWwindowmaximizefun callback);			// Window maximized/restored
-	void setFramebufferSizeCallback(GLFWframebuffersizefun callback);		// Framebuffer resized
-	void setWindowContentScaleCallback(GLFWwindowcontentscalefun callback);	// DPI/content scale changed
-
-	// Keyboard events
-	void setKeyCallback(GLFWkeyfun callback);								// Key pressed/released/repeated
-	void setCharCallback(GLFWcharfun callback);								// Unicode character input
-
-	// Mouse events
-	void setCursorPosCallback(GLFWcursorposfun callback);					// Mouse moved
-	void setCursorEnterCallback(GLFWcursorenterfun callback);				// Mouse entered/left window
-	void setMouseButtonCallback(GLFWmousebuttonfun callback);				// Mouse button pressed/released
-	void setScrollCallback(GLFWscrollfun callback);							// Mouse wheel scrolled
-
-	// File events
-	void setDropCallback(GLFWdropfun callback);								// Files dropped onto window
+	// event callback setters
+	void setWindowPosCallback(LumiWindowposfun callback);
+	void setWindowSizeCallback(LumiWindowsizefun callback);
+	void setWindowCloseCallback(LumiWindowclosefun callback);
+	void setWindowRefreshCallback(LumiWindowrefreshfun callback);
+	void setWindowFocusCallback(LumiWindowfocusfun callback);
+	void setWindowIconifyCallback(LumiWindowiconifyfun callback);
+	void setWindowMaximizeCallback(LumiWindowmaximizefun callback);
+	void setFramebufferSizeCallback(LumiFramebuffersizefun callback);
+	void setWindowContentScaleCallback(LumiWindowcontentscalefun callback);
+	void setKeyCallback(LumiKeyfun callback);
+	void setCharCallback(LumiCharfun callback);
+	void setCursorPosCallback(LumiCursorposfun callback);
+	void setCursorEnterCallback(LumiCursorenterfun callback);
+	void setMouseButtonCallback(LumiMousebuttonfun callback);
+	void setScrollCallback(LumiScrollfun callback);
+	void setDropCallback(LumiDropfun callback);
 
 	void close();
 
@@ -163,20 +181,20 @@ private:
 	void dropCallback(int path_count, const char **paths);
 
 	// custom event functions
-	GLFWwindowposfun customWindowPosCallback = nullptr;
-	GLFWwindowsizefun customWindowSizeCallback = nullptr;
-	GLFWwindowclosefun customWindowCloseCallback = nullptr;
-	GLFWwindowrefreshfun customWindowRefreshCallback = nullptr;
-	GLFWwindowfocusfun customWindowFocusCallback = nullptr;
-	GLFWwindowiconifyfun customWindowIconifyCallback = nullptr;
-	GLFWwindowmaximizefun customWindowMaximizeCallback = nullptr;
-	GLFWframebuffersizefun customFramebufferSizeCallback = nullptr;
-	GLFWwindowcontentscalefun customWindowContentScaleCallback = nullptr;
-	GLFWkeyfun customKeyCallback = nullptr;
-	GLFWcharfun customCharCallback = nullptr;
-	GLFWcursorposfun customCursorPosCallback = nullptr;
-	GLFWcursorenterfun customCursorEnterCallback = nullptr;
-	GLFWmousebuttonfun customMouseButtonCallback = nullptr;
-	GLFWscrollfun customScrollCallback = nullptr;
-	GLFWdropfun customDropCallback = nullptr;
+	LumiWindowposfun customWindowPosCallback = nullptr;
+	LumiWindowsizefun customWindowSizeCallback = nullptr;
+	LumiWindowclosefun customWindowCloseCallback = nullptr;
+	LumiWindowrefreshfun customWindowRefreshCallback = nullptr;
+	LumiWindowfocusfun customWindowFocusCallback = nullptr;
+	LumiWindowiconifyfun customWindowIconifyCallback = nullptr;
+	LumiWindowmaximizefun customWindowMaximizeCallback = nullptr;
+	LumiFramebuffersizefun customFramebufferSizeCallback = nullptr;
+	LumiWindowcontentscalefun customWindowContentScaleCallback = nullptr;
+	LumiKeyfun customKeyCallback = nullptr;
+	LumiCharfun customCharCallback = nullptr;
+	LumiCursorposfun customCursorPosCallback = nullptr;
+	LumiCursorenterfun customCursorEnterCallback = nullptr;
+	LumiMousebuttonfun customMouseButtonCallback = nullptr;
+	LumiScrollfun customScrollCallback = nullptr;
+	LumiDropfun customDropCallback = nullptr;
 };

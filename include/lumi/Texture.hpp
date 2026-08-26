@@ -9,12 +9,8 @@ class Texture {
 public:
 	explicit Texture(const std::string& path, bool flipVertically = true);
 
-	// Decodes an in-memory compressed image (e.g. bytes of a PNG/JPG file) - used for
-	// Assimp embedded textures where aiTexture::mHeight == 0.
 	static Texture fromMemory(const unsigned char* buffer, std::size_t size, bool flipVertically = true);
 
-	// Uploads already-decoded raw texels (B,G,R,A byte order per Assimp's aiTexel) - used for
-	// Assimp embedded textures where aiTexture::mHeight != 0.
 	static Texture fromRawBGRA(const unsigned char* data, int width, int height);
 
 	~Texture();

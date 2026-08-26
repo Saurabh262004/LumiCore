@@ -31,6 +31,8 @@ void FreeFlyCameraController::update(Window& window, Camera& camera, float delta
 
 		float distance = moveSpeed * deltaTime;
 
+		if (window.isKeyDown(Key::LeftControl)) distance *= 0.1;
+
 		if (window.isKeyDown(Key::W)) pos += forward * distance;
 		if (window.isKeyDown(Key::S)) pos -= forward * distance;
 		if (window.isKeyDown(Key::D)) pos += right * distance;

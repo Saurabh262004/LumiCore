@@ -51,8 +51,6 @@ Texture Texture::fromRawBGRA(const unsigned char* data, int width, int height) {
 	tex.height = height;
 	tex.channels = 4;
 
-	// Internal format must be a real GL sink format (GL_BGRA isn't valid there) - the driver
-	// reorders B/G/R/A into R/G/B/A during upload, since that's what `format` here describes.
 	tex.upload(data, GL_BGRA, GL_RGBA);
 
 	return tex;

@@ -17,7 +17,6 @@ private:
 	float viewportWidth{800.0f};
 	float viewportHeight{600.0f};
 
-	float orthoSize{10.0f};
 	bool perspective{true};
 
 	Mat4 viewProjection{};
@@ -55,10 +54,6 @@ public:
 	void setViewportResolution(float width, float height) {
 		viewportWidth = width;
 		viewportHeight = height;
-	}
-
-	void setOrthoSize(float value) {
-		orthoSize = value;
 	}
 
 	void setUsePerspective(bool value) {
@@ -116,10 +111,6 @@ public:
 		return viewProjection;
 	}
 
-	float getOrthoSize() const {
-		return orthoSize;
-	}
-
 	bool getUsePerspective() const {
 		return perspective;
 	}
@@ -135,8 +126,9 @@ public:
 		if (perspective) {
 			projection = Mat4::perspective(fov, aspect, nearPlane, farPlane);
 		} else {
-			float halfHeight = orthoSize * 0.5f;
-			float halfWidth = halfHeight * aspect;
+			float halfWidth = viewportWidth * 0.5f;
+			float halfHeight = viewportHeight * 0.5f;
+
 			projection = Mat4::ortho(-halfWidth, halfWidth, -halfHeight, halfHeight, nearPlane, farPlane);
 		}
 

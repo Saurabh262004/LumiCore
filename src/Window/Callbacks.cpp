@@ -159,37 +159,37 @@ void Window::staticDropCallback(GLFWwindow *glfwWindow, int path_count, const ch
 
 void Window::windowPosCallback(int xpos, int ypos) {
 	if (customWindowPosCallback)
-		customWindowPosCallback(window, xpos, ypos);
+		customWindowPosCallback(this, xpos, ypos);
 }
 
 void Window::windowSizeCallback(int width, int height) {
 	if (customWindowSizeCallback)
-		customWindowSizeCallback(window, width, height);
+		customWindowSizeCallback(this, width, height);
 }
 
 void Window::windowCloseCallback() {
 	if (customWindowCloseCallback)
-		customWindowCloseCallback(window);
+		customWindowCloseCallback(this);
 }
 
 void Window::windowRefreshCallback() {
 	if (customWindowRefreshCallback)
-		customWindowRefreshCallback(window);
+		customWindowRefreshCallback(this);
 }
 
 void Window::windowFocusCallback(int focused) {
 	if (customWindowFocusCallback)
-		customWindowFocusCallback(window, focused);
+		customWindowFocusCallback(this, focused);
 }
 
 void Window::windowIconifyCallback(int iconified) {
 	if (customWindowIconifyCallback)
-		customWindowIconifyCallback(window, iconified);
+		customWindowIconifyCallback(this, iconified);
 }
 
 void Window::windowMaximizeCallback(int maximized) {
 	if (customWindowMaximizeCallback)
-		customWindowMaximizeCallback(window, maximized);
+		customWindowMaximizeCallback(this, maximized);
 }
 
 void Window::framebufferSizeCallback(int width, int height) {
@@ -203,112 +203,112 @@ void Window::framebufferSizeCallback(int width, int height) {
 	}
 
 	if (customFramebufferSizeCallback)
-		customFramebufferSizeCallback(window, width, height);
+		customFramebufferSizeCallback(this, width, height);
 }
 
 void Window::windowContentScaleCallback(float xscale, float yscale) {
 	if (customWindowContentScaleCallback)
-		customWindowContentScaleCallback(window, xscale, yscale);
+		customWindowContentScaleCallback(this, xscale, yscale);
 }
 
 void Window::keyCallback(int key, int scancode, int action, int mods) {
 
 	if (customKeyCallback)
-		customKeyCallback(window, key, scancode, action, mods);
+		customKeyCallback(this, key, scancode, action, mods);
 }
 
 void Window::charCallback(unsigned int codepoint) {
 	if (customCharCallback)
-		customCharCallback(window, codepoint);
+		customCharCallback(this, codepoint);
 }
 
 void Window::cursorPosCallback(double xpos, double ypos) {
 	if (customCursorPosCallback)
-		customCursorPosCallback(window, xpos, ypos);
+		customCursorPosCallback(this, xpos, ypos);
 }
 
 void Window::cursorEnterCallback(int entered) {
 	if (customCursorEnterCallback)
-		customCursorEnterCallback(window, entered);
+		customCursorEnterCallback(this, entered);
 }
 
 void Window::mouseButtonCallback(int button, int action, int mods) {
 	if (customMouseButtonCallback)
-		customMouseButtonCallback(window, button, action, mods);
+		customMouseButtonCallback(this, button, action, mods);
 }
 
 void Window::scrollCallback(double xoffset, double yoffset) {
 	if (customScrollCallback)
-		customScrollCallback(window, xoffset, yoffset);
+		customScrollCallback(this, xoffset, yoffset);
 }
 
 void Window::dropCallback(int path_count, const char **paths) {
 	if (customDropCallback)
-		customDropCallback(window, path_count, paths);
+		customDropCallback(this, path_count, paths);
 }
 
 // custom event setting function
 
-void Window::setWindowPosCallback(GLFWwindowposfun callback) {
+void Window::setWindowPosCallback(LumiWindowposfun callback) {
 	customWindowPosCallback = callback;
 }
 
-void Window::setWindowSizeCallback(GLFWwindowsizefun callback) {
+void Window::setWindowSizeCallback(LumiWindowsizefun callback) {
 	customWindowSizeCallback = callback;
 }
 
-void Window::setWindowCloseCallback(GLFWwindowclosefun callback) {
+void Window::setWindowCloseCallback(LumiWindowclosefun callback) {
 	customWindowCloseCallback = callback;
 }
 
-void Window::setWindowRefreshCallback(GLFWwindowrefreshfun callback) {
+void Window::setWindowRefreshCallback(LumiWindowrefreshfun callback) {
 	customWindowRefreshCallback = callback;
 }
 
-void Window::setWindowFocusCallback(GLFWwindowfocusfun callback) {
+void Window::setWindowFocusCallback(LumiWindowfocusfun callback) {
 	customWindowFocusCallback = callback;
 }
 
-void Window::setWindowIconifyCallback(GLFWwindowiconifyfun callback) {
+void Window::setWindowIconifyCallback(LumiWindowiconifyfun callback) {
 	customWindowIconifyCallback = callback;
 }
 
-void Window::setWindowMaximizeCallback(GLFWwindowmaximizefun callback) {
+void Window::setWindowMaximizeCallback(LumiWindowmaximizefun callback) {
 	customWindowMaximizeCallback = callback;
 }
 
-void Window::setFramebufferSizeCallback(GLFWframebuffersizefun callback) {
+void Window::setFramebufferSizeCallback(LumiFramebuffersizefun callback) {
 	customFramebufferSizeCallback = callback;
 }
 
-void Window::setWindowContentScaleCallback(GLFWwindowcontentscalefun callback) {
+void Window::setWindowContentScaleCallback(LumiWindowcontentscalefun callback) {
 	customWindowContentScaleCallback = callback;
 }
 
-void Window::setKeyCallback(GLFWkeyfun callback) {
+void Window::setKeyCallback(LumiKeyfun callback) {
 	customKeyCallback = callback;
 }
 
-void Window::setCharCallback(GLFWcharfun callback) {
+void Window::setCharCallback(LumiCharfun callback) {
 	customCharCallback = callback;
 }
 
-void Window::setCursorPosCallback(GLFWcursorposfun callback) {
+void Window::setCursorPosCallback(LumiCursorposfun callback) {
 	customCursorPosCallback = callback;
 }
 
-void Window::setCursorEnterCallback(GLFWcursorenterfun callback) {
+void Window::setCursorEnterCallback(LumiCursorenterfun callback) {
 	customCursorEnterCallback = callback;
 }
 
-void Window::setMouseButtonCallback(GLFWmousebuttonfun callback) {
+void Window::setMouseButtonCallback(LumiMousebuttonfun callback) {
 	customMouseButtonCallback = callback;
 }
 
-void Window::setScrollCallback(GLFWscrollfun callback) {
+void Window::setScrollCallback(LumiScrollfun callback) {
 	customScrollCallback = callback;
 }
 
-void Window::setDropCallback(GLFWdropfun callback) {
+void Window::setDropCallback(LumiDropfun callback) {
 	customDropCallback = callback;
 }
