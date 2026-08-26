@@ -7,7 +7,15 @@
 
 #include <lumi/Window.hpp>
 
+int Window::windowCount = 0;
+
 Window::Window(int width, int height, bool fullscreen) : width{width}, height{height}, fullscreen{fullscreen} {
+	if (windowCount == 0 && !glfwInit()) {
+		throw std::runtime_error("Failed to initialize GLFW");
+	}
+
+	++windowCount;
+
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -31,12 +39,14 @@ Window::Window(int width, int height, bool fullscreen) : width{width}, height{he
 	}
 
 	if (!window) {
-		glfwTerminate();
+		--windowCount;
+		if (windowCount == 0) glfwTerminate();
 		throw std::runtime_error("Failed to create GLFW window");
 	} else {
 		if (!initOpenGL(width, height)) {
 			glfwDestroyWindow(window);
-			glfwTerminate();
+			--windowCount;
+			if (windowCount == 0) glfwTerminate();
 			throw std::runtime_error("Failed to initialize OpenGL");
 		} else {
 			glfwSetWindowUserPointer(window, this);
@@ -195,7 +205,18 @@ void Window::close() { active = false; }
 
 Window::~Window() {
 	std::cout << "Destroying window\n";
+
+	// release GL-owning resources while the context is still current
+	models.clear();
+	meshes.clear();
+	shaders.clear();
+	cameraControllers.clear();
+	cameras.clear();
+
 	if (window) glfwDestroyWindow(window);
+
+	--windowCount;
+	if (windowCount == 0) glfwTerminate();
 }
 
 GLFWwindow *Window::getWindow() {

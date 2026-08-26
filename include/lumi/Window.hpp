@@ -122,6 +122,8 @@ public:
 private:
 	GLFWwindow *window;
 
+	static int windowCount;
+
 	int width{};
 	int height{};
 	bool fullscreen{};

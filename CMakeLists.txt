@@ -46,3 +46,18 @@ target_link_libraries(app
 	PRIVATE
 		lumi
 )
+
+# Test application (uses local testAssets/, off by default)
+
+option(LUMI_BUILD_TESTAPP "Build testApp" OFF)
+
+if(LUMI_BUILD_TESTAPP)
+	add_executable(testApp
+		tests/Main.cpp
+	)
+
+	target_link_libraries(testApp
+		PRIVATE
+			lumi
+	)
+endif()

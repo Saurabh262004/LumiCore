@@ -28,7 +28,7 @@ public:
 	Texture& operator=(Texture&& other) noexcept;
 
 private:
-	Texture() = default; // only for use by the factory functions above, before upload() runs
+	Texture() = default;
 
 	void upload(const unsigned char* pixels, GLenum format, GLenum internalFormat);
 
