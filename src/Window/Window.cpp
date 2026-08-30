@@ -94,10 +94,6 @@ Shader* Window::getShader(const std::string id) {
 	return &shaders.at(id);
 }
 
-Camera* Window::getCamera(const std::string id) {
-	return &cameras.at(id);
-}
-
 Mesh* Window::getMesh(const std::string shaderID, const std::string camID, const std::string meshID) {
 	for (auto& meshEntry : meshes.at(shaderID).at(camID)) {
 		if (meshEntry.id == meshID) return &meshEntry.mesh;
@@ -114,37 +110,8 @@ Model* Window::getModel(const std::string shaderID, const std::string camID, con
 	throw std::runtime_error("getMesh: no model registered with id: \"" + modelID + "\" under shaderID: \"" + shaderID + "\" and camID: \"" + camID + "\"");
 }
 
-bool Window::hasCamera(const std::string& id) const {
-	return cameras.find(id) != cameras.end();
-}
-
 bool Window::hasShader(const std::string& id) const {
 	return shaders.find(id) != shaders.end();
-}
-
-void Window::addCamera(std::string id) {
-	cameras.insert_or_assign(std::move(id), Camera());
-}
-
-void Window::setCameraController(const std::string& camID, std::unique_ptr<CameraController> controller) {
-	if (!hasCamera(camID)) {
-		throw std::runtime_error("setCameraController: no camera registered with id \"" + camID + "\"");
-	}
-
-	if (controller) {
-		cameraControllers[camID] = std::move(controller);
-	} else {
-		cameraControllers.erase(camID);
-	}
-}
-
-void Window::clearCameraController(const std::string& camID) {
-	cameraControllers.erase(camID);
-}
-
-CameraController* Window::getCameraController(const std::string& camID) {
-	auto it = cameraControllers.find(camID);
-	return (it != cameraControllers.end()) ? it->second.get() : nullptr;
 }
 
 bool Window::isKeyDown(Key key) const {

@@ -80,14 +80,14 @@ public:
 	Model* getModel(const std::string shaderID, const std::string camID, const std::string modelID);
 
 	bool hasCamera(const std::string& id) const;
-	bool hasShader(const std::string& id) const;
-
 	void addCamera(std::string id);
-	void addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath);
 
 	void setCameraController(const std::string& camID, std::unique_ptr<CameraController> controller);
 	void clearCameraController(const std::string& camID);
 	CameraController* getCameraController(const std::string& camID); // nullptr if no controller is set
+
+	bool hasShader(const std::string& id) const;
+	void addShader(std::string id, const std::string& vertexPath, const std::string& fragmentPath);
 
 	bool isKeyDown(Key key) const;
 	Vec2 getMouseDelta() const;
