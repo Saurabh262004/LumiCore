@@ -173,7 +173,6 @@ void Window::close() { active = false; }
 Window::~Window() {
 	std::cout << "Destroying window\n";
 
-	// release GL-owning resources while the context is still current
 	models.clear();
 	meshes.clear();
 	shaders.clear();

@@ -23,6 +23,7 @@ void main() {
 	}
 
 	vec3 N = normalize(vNormal);
+
 	float diff = max(dot(N, -lightDir), 0.0);
 
 	float ambient = 0.15;

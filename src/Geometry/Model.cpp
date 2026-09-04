@@ -9,13 +9,21 @@
 #include <assimp/material.h>
 #include <assimp/texture.h>
 
+#include <lumi/Geometry/Vec.hpp>
 #include <lumi/Geometry/Model.hpp>
 #include <lumi/Geometry/Vertex.hpp>
 #include <lumi/Texture.hpp>
 
 Model::Model(const std::string& path, bool normalizeToUnitCube) {
 	Assimp::Importer importer;
-	const aiScene* scene = importer.ReadFile(path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_PreTransformVertices);
+
+	const aiScene* scene = importer.ReadFile(
+		path,
+		aiProcess_Triangulate |
+		aiProcess_GenSmoothNormals |
+		aiProcess_CalcTangentSpace |
+		aiProcess_PreTransformVertices
+	);
 
 	if (!scene || (scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) || !scene->mRootNode) {
 		throw std::runtime_error("Assimp error: " + std::string(importer.GetErrorString()));
@@ -61,12 +69,54 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 
 	for (unsigned i = 0; i < mesh->mNumVertices; ++i) {
 		Vertex v{};
-		v.position = { mesh->mVertices[i].x * importScale, mesh->mVertices[i].y * importScale, mesh->mVertices[i].z * importScale };
-		if (mesh->HasNormals())
-			v.normal = { mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z };
+
+		v.position = {
+			mesh->mVertices[i].x * importScale,
+			mesh->mVertices[i].y * importScale,
+			mesh->mVertices[i].z * importScale
+		};
+
+		if (mesh->HasNormals()) {
+			v.normal = {
+				mesh->mNormals[i].x,
+				mesh->mNormals[i].y,
+				mesh->mNormals[i].z
+			};
+		}
+
 		v.texCoord = mesh->mTextureCoords[0]
-			? Vec2{ mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y }
-			: Vec2{ 0.0f, 0.0f };
+			? Vec2{
+				mesh->mTextureCoords[0][i].x,
+				mesh->mTextureCoords[0][i].y
+			}
+			: Vec2{0.0f, 0.0f};
+
+		if (mesh->HasTangentsAndBitangents()) {
+			Vec3 tangent{
+				mesh->mTangents[i].x,
+				mesh->mTangents[i].y,
+				mesh->mTangents[i].z
+			};
+
+			Vec3 bitangent{
+				mesh->mBitangents[i].x,
+				mesh->mBitangents[i].y,
+				mesh->mBitangents[i].z
+			};
+
+			float handedness =
+				Vec3::dot(Vec3::cross(v.normal, tangent), bitangent) < 0.0f
+					? -1.0f
+					: 1.0f;
+
+			v.tangent = {
+				tangent.x,
+				tangent.y,
+				tangent.z,
+				handedness
+			};
+		}
+
 		vertices.push_back(v);
 	}
 
@@ -74,6 +124,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 	indices.reserve(mesh->mNumFaces * 3);
 	for (unsigned i = 0; i < mesh->mNumFaces; ++i) {
 		const aiFace& face = mesh->mFaces[i];
+
 		for (unsigned j = 0; j < face.mNumIndices; ++j)
 			indices.push_back(face.mIndices[j]);
 	}
@@ -84,6 +135,7 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene) {
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		aiColor4D diffuseColor{1.0f, 1.0f, 1.0f, 1.0f};
+
 		if (aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuseColor) == AI_SUCCESS) {
 			result.setMaterialColor({ diffuseColor.r, diffuseColor.g, diffuseColor.b });
 		}
