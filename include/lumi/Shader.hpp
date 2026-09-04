@@ -1,25 +1,75 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <unordered_map>
 #include <glad/glad.h>
-#include <GLFW/glfw3.h>
 
 #include <lumi/Geometry/Vec.hpp>
 #include <lumi/Geometry/Mat.hpp>
-#include <lumi/Geometry/Mat.hpp>
+
+struct Vec2UniformEntry {
+	Vec2 vec;
+	GLint location;
+};
+
+struct Vec3UniformEntry {
+	Vec3 vec;
+	GLint location;
+};
+
+struct Vec4UniformEntry {
+	Vec4 vec;
+	GLint location;
+};
+
+struct Mat4UniformEntry {
+	Mat4 mat;
+	GLint location;
+};
+
+struct IntUniformEntry {
+	int value;
+	GLint location;
+};
 
 class Shader {
 public:
 	Shader(const std::string& vertexPath, const std::string& fragmentPath);
 
-	void addVec2Uniform(std::string id, Vec2 vec);
-	void addVec3Uniform(std::string id, Vec3 vec);
-	void addVec4Uniform(std::string id, Vec4 vec);
-	void addMat4Uniform(std::string id, Mat4 mat);
-	void addIntUniform(std::string id, int value);
+	void addVec2Uniform(const std::string& id, const Vec2& vec);
+	void addVec3Uniform(const std::string& id, const Vec3& vec);
+	void addVec4Uniform(const std::string& id, const Vec4& vec);
+	void addMat4Uniform(const std::string& id, const Mat4& mat);
+	void addIntUniform(const std::string& id, int value);
+
+	bool isVec2Uniform(const std::string& id) const;
+	bool isVec3Uniform(const std::string& id) const;
+	bool isVec4Uniform(const std::string& id) const;
+	bool isMat4Uniform(const std::string& id) const;
+	bool isIntUniform(const std::string& id) const;
+
+	bool isVec2UniformActive(const std::string& id) const;
+	bool isVec3UniformActive(const std::string& id) const;
+	bool isVec4UniformActive(const std::string& id) const;
+	bool isMat4UniformActive(const std::string& id) const;
+	bool isIntUniformActive(const std::string& id) const;
+
+	void activateVec2Uniform(const std::string& id);
+	void activateVec3Uniform(const std::string& id);
+	void activateVec4Uniform(const std::string& id);
+	void activateMat4Uniform(const std::string& id);
+	void activateIntUniform(const std::string& id);
+
+	void deactivateVec2Uniform(const std::string& id);
+	void deactivateVec3Uniform(const std::string& id);
+	void deactivateVec4Uniform(const std::string& id);
+	void deactivateMat4Uniform(const std::string& id);
+	void deactivateIntUniform(const std::string& id);
 
 	void uploadUniforms();
+
+	GLuint getProgram();
 
 	~Shader();
 
@@ -28,6 +78,12 @@ public:
 
 	Shader(Shader&& other) noexcept;
 	Shader& operator=(Shader&& other) noexcept;
+
+	void setVec2(const Vec2& vec, const GLint& location) const;
+	void setVec3(const Vec3& vec, const GLint& location) const;
+	void setVec4(const Vec4& vec, const GLint& location) const;
+	void setMat4(const Mat4& mat, const GLint& location) const;
+	void setInt(int value, const GLint& location) const;
 
 	void setVec2(const std::string& name, const Vec2& vec) const;
 	void setVec3(const std::string& name, const Vec3& vec) const;
@@ -40,9 +96,15 @@ public:
 private:
 	GLuint program{};
 
-	std::unordered_map<std::string, Vec2> vec2Uniforms;
-	std::unordered_map<std::string, Vec3> vec3Uniforms;
-	std::unordered_map<std::string, Vec4> vec4Uniforms;
-	std::unordered_map<std::string, Mat4> mat4Uniforms;
-	std::unordered_map<std::string, int> intUniforms;
+	std::unordered_map<std::string, Vec2UniformEntry> vec2Uniforms;
+	std::unordered_map<std::string, Vec3UniformEntry> vec3Uniforms;
+	std::unordered_map<std::string, Vec4UniformEntry> vec4Uniforms;
+	std::unordered_map<std::string, Mat4UniformEntry> mat4Uniforms;
+	std::unordered_map<std::string, IntUniformEntry> intUniforms;
+
+	std::vector<std::string> activeVec2Uniforms{};
+	std::vector<std::string> activeVec3Uniforms{};
+	std::vector<std::string> activeVec4Uniforms{};
+	std::vector<std::string> activeMat4Uniforms{};
+	std::vector<std::string> activeIntUniforms{};
 };

@@ -45,12 +45,12 @@ void Window::loop() {
 
 			shaders.at(shaderID).uploadUniforms();
 
-			if (checkError("mesh, shader set vec3")) errorsInLoop = true;
+			if (checkError("mesh, shader upload uniforms")) errorsInLoop = true;
 
 			for (auto& [camID, meshEntries] : camMap) {
 				shaders.at(shaderID).setMat4("viewProjection", cameras.at(camID).getViewProjection());
 
-				if (checkError("mesh, shader set mat4")) errorsInLoop = true;
+				if (checkError("mesh, shader set viewProjection")) errorsInLoop = true;
 
 				for (auto& meshEntry : meshEntries) meshEntry.mesh.draw(shaders.at(shaderID));
 
@@ -65,12 +65,12 @@ void Window::loop() {
 
 			shaders.at(shaderID).uploadUniforms();
 
-			if (checkError("model, shader set vec3")) errorsInLoop = true;
+			if (checkError("model, shader upload uniforms")) errorsInLoop = true;
 
 			for (auto& [camID, modelEntries] : camMap) {
 				shaders.at(shaderID).setMat4("viewProjection", cameras.at(camID).getViewProjection());
 
-				if (checkError("model, shader set mat4")) errorsInLoop = true;
+				if (checkError("model, shader set viewProjection")) errorsInLoop = true;
 
 				for (auto& modelEntry : modelEntries) modelEntry.model.draw(shaders.at(shaderID));
 
